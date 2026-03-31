@@ -1,0 +1,15 @@
+import { prisma } from "@/lib/db/prisma-helper";
+import { NextResponse } from "next/server";
+
+export async function POST() {
+  await prisma.notification.updateMany({
+    where: {
+      isRead: false,
+    },
+    data: {
+      isRead: true,
+    },
+  });
+
+  return NextResponse.json({ success: true });
+}
