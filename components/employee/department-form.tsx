@@ -1,142 +1,175 @@
 "use client";
 
-import { departmentSchema } from '@/lib/validators'
-import { Department } from '@/types'
-import { zodResolver } from '@hookform/resolvers/zod'
-import React from 'react'
-import { ControllerRenderProps, SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import z from 'zod'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
-import { Input } from '../ui/input'
-import { Textarea } from '../ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Button } from '../ui/button';
-import { ArrowRight, Loader } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { Status } from '@/lib/generated/prisma/enums';
-import { createDepartment, updateDepartment } from '@/lib/actions/department';
-import { departmentDefaultValues } from '@/lib/constants';
+import { departmentSchema } from "@/lib/validators";
+import { Department } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import React from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { Button } from "../ui/button";
+import { ArrowRight, Loader } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Status } from "@/lib/generated/prisma/enums";
+import { createDepartment, updateDepartment } from "@/lib/actions/department";
 
-const DepartmentForm = ({ data, update = false }: { data?: Department, update: boolean }) => {
-    const router = useRouter()
-    const id = data?.id;
+type FormValues = z.infer<typeof departmentSchema>;
 
-    const form = useForm<z.infer<typeof departmentSchema>>({
-        resolver: zodResolver(departmentSchema),
-        defaultValues: data || departmentDefaultValues
-    })
+const DepartmentForm = ({
+  data,
+  update = false,
+}: {
+  data?: Department;
+  update: boolean;
+}) => {
+  const router = useRouter();
+  const id = data?.id;
 
-    const [isPending, startTransition] = React.useTransition()
+  const form = useForm<FormValues>({
+    resolver: zodResolver(departmentSchema),
+    defaultValues: {
+      name: data?.name ?? "",
+      code: data?.code ?? "",
+      description: data?.description ?? "",
+      status: data?.status ?? "ACTIVE",
+    },
+  });
 
-    const onSubmit: SubmitHandler<z.infer<typeof departmentSchema>> = async (values: any) => {
+  const [isPending, startTransition] = React.useTransition();
 
-        startTransition(async () => {
-            let res;
+  const onSubmit: SubmitHandler<FormValues> = async (values) => {
+    console.log("SUBMIT:", values);
 
-            if (update && id) {
-                res = await updateDepartment(values, id)
-            } else {
-                res = await createDepartment(values)
-            }
+    startTransition(async () => {
+      let res;
 
-            if (!res?.success) {
-                toast.error("Error", {
-                    description: res?.message
-                })
-            } else {
-                router.push("/admin/department")
-            }
+      if (update && id) {
+        res = await updateDepartment(values, id);
+      } else {
+        res = await createDepartment(values);
+      }
 
-        })
-    }
-    return (
-        <Form {...form}>
-            <form className='space-y-4' onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))}>
-                <div className='grid grid-cols-2 gap-4'>
-                    <div className='flex flex-col gap-5'>
-                        <FormField
-                            control={form.control}
-                            name='name'
-                            render={({
-                                field
-                            }: {
-                                field: ControllerRenderProps<z.infer<typeof departmentSchema>, "name">
-                            }) => (
-                                <FormItem>
-                                    <FormLabel>Name</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder='Enter name' {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                    <div className='flex flex-col gap-5'>
-                        <FormField
-                            control={form.control}
-                            name='status'
-                            render={({
-                                field
-                            }: {
-                                field: ControllerRenderProps<z.infer<typeof departmentSchema>, "status">
-                            }) => (
-                                <FormItem>
-                                    <FormLabel>Status</FormLabel>
-                                    <FormControl>
-                                        <Select
-                                            defaultValue={field.value}
-                                            onValueChange={(v) => field.onChange(v as Status)}
-                                        >
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Status" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value={Status.ACTIVE}>Active</SelectItem>
-                                                <SelectItem value={Status.INACTIVE}>Inactive</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                </div>
+      if (!res?.success) {
+        toast.error("Error", { description: res?.message });
+      } else {
+        toast.success("Success", { description: res?.message });
+        router.push("/admin/department");
+      }
+    });
+  };
 
-                <div className='flex flex-col gap-5'>
-                    <FormField
-                        control={form.control}
-                        name='description'
-                        render={({
-                            field
-                        }: {
-                            field: ControllerRenderProps<z.infer<typeof departmentSchema>, "description">
-                        }) => (
-                            <FormItem>
-                                <FormLabel>Description</FormLabel>
-                                <FormControl>
-                                    <Textarea rows={20} className='h-40' placeholder='Enter name' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
+  return (
+    <Form {...form}>
+      <form
+        className="space-y-6"
+        onSubmit={form.handleSubmit(onSubmit, console.log)}
+      >
+        <div className="grid grid-cols-3 gap-4">
 
-                <div className='flex gap-2'>
-                    <Button type='submit' className='cursor-pointer' disabled={isPending}>
-                        {
-                            isPending ? (<Loader className='w-4 h-4 animate-spin cursor-pointer' />) : (
-                                <ArrowRight className='w-4 h-4' />
-                            )
-                        }{" "} Save
-                    </Button>
-                </div>
-            </form>
-        </Form>
-    )
-}
+          {/* NAME */}
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Department Name</FormLabel>
+                <FormControl>
+                  <Input {...field} value={field.value ?? ""} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-export default DepartmentForm
+          {/* CODE */}
+          <FormField
+            control={form.control}
+            name="code"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Department Code</FormLabel>
+                <FormControl>
+                  <Input {...field} value={field.value ?? ""} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* STATUS */}
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value={Status.ACTIVE}>Active</SelectItem>
+                    <SelectItem value={Status.INACTIVE}>Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
+
+        </div>
+
+        {/* DESCRIPTION */}
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  value={field.value ?? ""}
+                  className="h-40"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit" disabled={isPending}>
+          {isPending ? (
+            <Loader className="animate-spin w-4 h-4" />
+          ) : (
+            <ArrowRight className="w-4 h-4" />
+          )}
+          Submit
+        </Button>
+      </form>
+    </Form>
+  );
+};
+
+export default DepartmentForm;

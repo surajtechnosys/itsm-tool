@@ -10,7 +10,7 @@ type Props = {
   onDelete: (id: string) => void;
 };
 
-export const getDepartmentColumns = ({
+export const getDesignationColumns = ({
   canEdit,
   canDelete,
   onDelete,
@@ -22,7 +22,7 @@ export const getDepartmentColumns = ({
   },
   {
     accessorKey: "id",
-    header: "DEPARTMENT ID",
+    header: "DESIGNATION ID",
   },
   {
     accessorKey: "name",
@@ -31,6 +31,10 @@ export const getDepartmentColumns = ({
   {
     accessorKey: "code",
     header: "CODE",
+  },
+  {
+    accessorKey: "level",
+    header: "LEVEL",
   },
   {
     accessorKey: "status",
@@ -59,13 +63,13 @@ export const getDepartmentColumns = ({
     id: "actions",
     header: "ACTION",
     cell: ({ row }) => {
-      const dept = row.original;
+      const d = row.original;
 
       return (
         <div className="flex gap-2">
           {canEdit && (
             <Button asChild className="bg-orange-500 hover:bg-orange-600">
-              <Link href={`/admin/department/edit/${dept.id}`}>
+              <Link href={`/admin/designation/edit/${d.id}`}>
                 <EditIcon size={16} />
               </Link>
             </Button>
@@ -74,7 +78,7 @@ export const getDepartmentColumns = ({
           {canDelete && (
             <Button
               variant="destructive"
-              onClick={() => onDelete(dept.id)}
+              onClick={() => onDelete(d.id)}
             >
               <Trash size={16} />
             </Button>

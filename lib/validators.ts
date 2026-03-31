@@ -77,13 +77,19 @@ export const deviceSchema = z.object({
 });
 
 // department schema
+
 export const departmentSchema = z.object({
   id: z.string().optional(),
+
   name: z.string().min(1, "Department name is required"),
+  code: z.string().min(1, "Department code is required"), // ✅ ADD
+
   description: z.string().min(1, "Department description is required"),
+
   status: z.enum(Object.values(Status)),
-  createdAt: z.date().nullable().optional(),
-  updatedAt: z.date().nullable().optional(),
+
+  createdAt: z.date().optional().nullable(),
+  updatedAt: z.date().optional().nullable(),
 });
 
 // employee schema
@@ -101,6 +107,25 @@ export const employeeSchema = z.object({
   locationId: z.string().min(1, "Location is required"),
   createdAt: z.date().nullable().optional(),
   updatedAt: z.date().nullable().optional(),
+});
+
+
+//designation schema
+
+export const designationSchema = z.object({
+  id: z.string().optional(),
+
+  name: z.string().min(1, "Designation title is required"),
+  code: z.string().min(1, "Designation code is required"),
+
+  level: z.coerce.number().min(1, "Level is required"),
+
+  description: z.string().min(1, "Description is required"),
+
+  status: z.enum(Object.values(Status)),
+
+  createdAt: z.date().optional().nullable(),
+  updatedAt: z.date().optional().nullable(),
 });
 
 // location schema

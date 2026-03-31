@@ -1,130 +1,130 @@
 "use server";
 
-import { Employee } from "@/types";
 import { prisma } from "../db/prisma-helper";
 import { employeeSchema } from "../validators";
 import { formatError } from "../utils";
+import { auth } from "@/auth";
+import { getUserPermissions, canAccess } from "@/lib/rbac";
 
-/* ---------------- GET ALL ---------------- */
-
+/* ---------------- GET ---------------- */
 export async function getEmployee() {
   return prisma.employee.findMany({
-    orderBy: {
-      createdAt: "desc",
+    orderBy: { createdAt: "desc" },
+    include: {
+      department: true,
+      designation: true,
     },
   });
 }
 
 /* ---------------- CREATE ---------------- */
-
-export async function createEmployee(data: Employee) {
+export async function createEmployee(data: any) {
   try {
-    const employee = employeeSchema.parse(data);
+    const session = await auth();
+    if (!session?.user?.email) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    const user = await getUserPermissions(session.user.email);
+
+    if (!canAccess(user, "/admin/employee", "create")) {
+      return { success: false, message: "No permission" };
+    }
+
+    const emp = employeeSchema.parse(data);
 
     await prisma.employee.create({
       data: {
-        first_name: employee.first_name,
-        last_name: employee.last_name,
-        email: employee.email,
-        phoneNumber: employee.phoneNumber,
-        dateOfBirth: employee.dateOfBirth,
-        hireDate: employee.hireDate,
-        salary: employee.salary,
-        departmentId: employee.departmentId,
-        locationId: employee.locationId,
-        status: employee.status,
+        first_name: emp.first_name,
+        last_name: emp.last_name,
+        email: emp.email,
+        phoneNumber: emp.phoneNumber,
+        hireDate: emp.hireDate,
+        departmentId: emp.departmentId,
+        designationId: emp.designationId,
+        locationId: emp.locationId,
+        status: emp.status,
       },
     });
 
-    return {
-      success: true,
-      message: "Employee created successfully",
-    };
+    return { success: true, message: "Employee created successfully" };
   } catch (error) {
-    return {
-      success: false,
-      message: formatError(error),
-    };
+    return { success: false, message: formatError(error) };
   }
 }
 
 /* ---------------- GET BY ID ---------------- */
-
 export async function getEmployeeById(id: string) {
   try {
-    const employee = await prisma.employee.findUnique({
+    const data = await prisma.employee.findUnique({
       where: { id },
     });
 
-    if (!employee) {
-      return {
-        success: false,
-        message: "Employee not found",
-      };
+    if (!data) {
+      return { success: false, message: "Not found" };
     }
 
-    return {
-      success: true,
-      data: employee,
-    };
+    return { success: true, data };
   } catch (error) {
-    return {
-      success: false,
-      message: formatError(error),
-    };
+    return { success: false, message: formatError(error) };
   }
 }
 
 /* ---------------- UPDATE ---------------- */
-
-export async function updateEmployee(data: Employee, id: string) {
+export async function updateEmployee(data: any, id: string) {
   try {
-    const employee = employeeSchema.parse(data);
+    const session = await auth();
+    if (!session?.user?.email) {
+      return { success: false };
+    }
+
+    const user = await getUserPermissions(session.user.email);
+
+    if (!canAccess(user, "/admin/employee", "edit")) {
+      return { success: false, message: "No permission" };
+    }
+
+    const emp = employeeSchema.parse(data);
 
     await prisma.employee.update({
       where: { id },
       data: {
-        first_name: employee.first_name,
-        last_name: employee.last_name,
-        email: employee.email,
-        phoneNumber: employee.phoneNumber,
-        dateOfBirth: employee.dateOfBirth,
-        hireDate: employee.hireDate,
-        salary: employee.salary,
-        departmentId: employee.departmentId,
-        locationId: employee.locationId,
-        status: employee.status,
+        first_name: emp.first_name,
+        last_name: emp.last_name,
+        email: emp.email,
+        phoneNumber: emp.phoneNumber,
+        hireDate: emp.hireDate,
+        departmentId: emp.departmentId,
+        designationId: emp.designationId,
+        locationId: emp.locationId,
+        status: emp.status,
       },
     });
 
-    return {
-      success: true,
-      message: "Employee updated successfully",
-    };
+    return { success: true, message: "Updated successfully" };
   } catch (error) {
-    return {
-      success: false,
-      message: formatError(error),
-    };
+    return { success: false, message: formatError(error) };
   }
 }
 
 /* ---------------- DELETE ---------------- */
-
 export async function deleteEmployee(id: string) {
   try {
-    await prisma.employee.delete({
-      where: { id },
-    });
+    const session = await auth();
+    if (!session?.user?.email) {
+      return { success: false };
+    }
 
-    return {
-      success: true,
-      message: "Employee deleted successfully",
-    };
+    const user = await getUserPermissions(session.user.email);
+
+    if (!canAccess(user, "/admin/employee", "delete")) {
+      return { success: false, message: "No permission" };
+    }
+
+    await prisma.employee.delete({ where: { id } });
+
+    return { success: true, message: "Deleted successfully" };
   } catch (error) {
-    return {
-      success: false,
-      message: formatError(error),
-    };
+    return { success: false, message: formatError(error) };
   }
 }

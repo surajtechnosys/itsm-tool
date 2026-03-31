@@ -211,13 +211,20 @@ model DeviceHistory {
 
 model Department {
   id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
   name        String     @unique(map: "department_name_idx")
+  code        String     @unique(map: "department_code_idx")  // ✅ ADD THIS
+
   description String
   status      Status     @default(ACTIVE)
+
   employee    Employee[]
 
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  updatedAt DateTime @updatedAt @db.Timestamp(6)
+  createdAt   DateTime   @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime   @updatedAt @db.Timestamp(6)
+
+  @@index([status])
+  @@index([code])
 }
 
 model Location {
@@ -292,6 +299,9 @@ model Employee {
   locationId String   @db.Uuid
   location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
+  designationId String?   @db.Uuid
+  designation   Designation? @relation(fields: [designationId], references: [id], onDelete: SetNull)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -323,6 +333,26 @@ model DeviceAssigned {
 
   @@index([deviceId])
   @@index([employeeId])
+}
+
+model Designation {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  name        String   @unique(map: "designation_name_idx")
+  code        String   @unique(map: "designation_code_idx")
+
+  level       Int
+  description String
+
+  status      Status   @default(ACTIVE)
+
+  employee    Employee[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([code])
 }
 
 model Vendor {

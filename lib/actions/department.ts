@@ -19,12 +19,13 @@ export async function createDepartment(data: any) {
     await prisma.department.create({
       data: {
         name: dept.name,
+        code: dept.code,
         description: dept.description,
         status: dept.status,
       },
     });
 
-    return { success: true, message: "Created" };
+    return { success: true, message: "Department created successfully" };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }
@@ -34,12 +35,13 @@ export async function createDepartment(data: any) {
 export async function getDepartmentById(id: string) {
   const data = await prisma.department.findUnique({ where: { id } });
 
-  if (!data) return { success: false };
+  if (!data) {
+    return { success: false, message: "Not found" };
+  }
 
   return { success: true, data };
 }
 
-/* UPDATE */
 /* UPDATE */
 export async function updateDepartment(data: any, id: string) {
   try {
@@ -49,12 +51,13 @@ export async function updateDepartment(data: any, id: string) {
       where: { id },
       data: {
         name: dept.name,
+        code: dept.code,
         description: dept.description,
         status: dept.status,
       },
     });
 
-    return { success: true };
+    return { success: true, message: "Department updated successfully" };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }
@@ -65,7 +68,7 @@ export async function deleteDepartment(id: string) {
   try {
     await prisma.department.delete({ where: { id } });
 
-    return { success: true };
+    return { success: true, message: "Department deleted successfully" };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }

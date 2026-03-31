@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/data-table";
-import { getDepartmentColumns } from "./department-columns";
-import { deleteDepartment } from "@/lib/actions/department";
+import { getDesignationColumns } from "./designation-columns";
+import { deleteDesignation } from "@/lib/actions/designation";
 
-export default function DepartmentTable({
+export default function DesignationTable({
   data,
   canEdit,
   canDelete,
@@ -16,23 +16,19 @@ export default function DepartmentTable({
   const [tableData, setTableData] = useState<any[]>(data);
 
   const deleteHandler = async (id: string) => {
-    const res = await deleteDepartment(id);
+    const res = await deleteDesignation(id);
 
     if (!res?.success) {
-      toast.error("Error", {
-        description: res?.message,
-      });
+      toast.error("Error", { description: res?.message });
       return;
     }
 
-    toast.success("Success", {
-      description: res?.message,
-    });
+    toast.success("Success", { description: res?.message });
 
     setTableData((prev) => prev.filter((d) => d.id !== id));
   };
 
-  const columns = getDepartmentColumns({
+  const columns = getDesignationColumns({
     canEdit,
     canDelete,
     onDelete: deleteHandler,

@@ -62,6 +62,7 @@ export default async function RootLayout({
           "/admin/module",
           "/admin/configuration",
           "/admin/notifications",
+          "/admin/designation",
           "/admin/dashboard",
         ]
       : dbUser?.role?.roleModules?.reduce((acc, rm) => {

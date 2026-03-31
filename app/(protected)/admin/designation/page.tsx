@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import EmployeeTable from "./employee-table";
-import { getEmployee } from "@/lib/actions/employee";
+import DesignationTable from "./designation-table";
+import { getDesignation } from "@/lib/actions/designation";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions, canAccess } from "@/lib/rbac";
 
-const EmployeePage = async () => {
+const DesignationPage = async () => {
   const session = await auth();
 
   if (!session?.user?.email) {
@@ -14,7 +14,7 @@ const EmployeePage = async () => {
   }
 
   const user = await getUserPermissions(session.user.email);
-  const route = "/admin/employee";
+  const route = "/admin/designation";
 
   if (!canAccess(user, route, "view")) {
     redirect("/404");
@@ -27,20 +27,20 @@ const EmployeePage = async () => {
   const canEdit = isAdmin || canAccess(user, route, "edit");
   const canDelete = isAdmin || canAccess(user, route, "delete");
 
-  const employees = await getEmployee();
+  const designation = await getDesignation();
 
   return (
     <div className="mt-2">
-      <EmployeeTable
-        data={employees}
+      <DesignationTable
+        data={designation}
         canEdit={canEdit}
         canDelete={canDelete}
-        title="Employees"
+        title="Designation"
         actions={
           canCreate && (
             <Button className="bg-blue-500 hover:bg-blue-600">
-              <Link href="/admin/employee/create">
-                Add Employee
+              <Link href="/admin/designation/create">
+                Add Designation
               </Link>
             </Button>
           )
@@ -50,4 +50,4 @@ const EmployeePage = async () => {
   );
 };
 
-export default EmployeePage;
+export default DesignationPage;

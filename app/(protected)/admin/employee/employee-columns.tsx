@@ -3,7 +3,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EditIcon, Trash } from "lucide-react";
 import Link from "next/link";
-import { format } from "date-fns";
 
 type Props = {
   canEdit: boolean;
@@ -17,48 +16,43 @@ export const getEmployeeColumns = ({
   onDelete,
 }: Props): ColumnDef<any>[] => [
   {
-    accessorKey: "first_name",
-    header: "First Name",
+    id: "index",
+    header: "#",
+    cell: ({ row }) => row.index + 1,
   },
   {
-    accessorKey: "last_name",
-    header: "Last Name",
+    accessorKey: "id",
+    header: "Employee ID",
+  },
+  {
+    id: "name",
+    header: "Name",
+    cell: ({ row }) =>
+      `${row.original.first_name} ${row.original.last_name}`,
   },
   {
     accessorKey: "email",
     header: "Email",
   },
   {
-    accessorKey: "phoneNumber",
-    header: "Phone",
+    id: "department",
+    header: "Department",
+    cell: ({ row }) => row.original.department?.name || "-",
   },
   {
-    accessorKey: "dateOfBirth",
-    header: "DOB",
-    cell: ({ row }) => {
-      const value = row.original.dateOfBirth;
-      return value ? format(new Date(value), "PPP") : "-";
-    },
+    id: "designation",
+    header: "Designation",
+    cell: ({ row }) => row.original.designation?.name || "-",
   },
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.original.status;
-
-      return status === "ACTIVE" ? (
+      return row.original.status === "ACTIVE" ? (
         <Badge className="bg-green-500">ACTIVE</Badge>
       ) : (
         <Badge variant="destructive">INACTIVE</Badge>
       );
-    },
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Created",
-    cell: ({ row }) => {
-      const value = row.original.createdAt;
-      return value ? format(new Date(value), "PPP") : "-";
     },
   },
   {
@@ -70,7 +64,7 @@ export const getEmployeeColumns = ({
       return (
         <div className="flex gap-2">
           {canEdit && (
-            <Button asChild className="bg-orange-500 hover:bg-orange-600">
+            <Button asChild size="sm" className="bg-orange-500">
               <Link href={`/admin/employee/edit/${emp.id}`}>
                 <EditIcon size={16} />
               </Link>
@@ -79,6 +73,7 @@ export const getEmployeeColumns = ({
 
           {canDelete && (
             <Button
+              size="sm"
               variant="destructive"
               onClick={() => onDelete(emp.id)}
             >

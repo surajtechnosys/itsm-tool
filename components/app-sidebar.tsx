@@ -117,6 +117,11 @@ const data = {
           url: "/admin/location",
           icon: LocationEdit,
         },
+        {
+          title: "Designation",
+          url: "/admin/designation",
+          icon: UserCog,
+        }
       ],
     },
     {

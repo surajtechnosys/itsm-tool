@@ -22,6 +22,7 @@ async function main() {
     { name: "Module", route: "/admin/module" },
     { name: "Configuration", route: "/admin/configuration" },
     { name: "Dashboard", route: "/admin/dashboard" },
+    { name: "Designation", route: "/admin/designation" },
     { name: "Notifications", route: "/admin/notifications" },
   ];
 
