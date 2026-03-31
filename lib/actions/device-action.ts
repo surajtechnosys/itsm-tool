@@ -42,14 +42,18 @@ export async function createDevice(data: Device) {
       const createdDevice = await tx.device.create({
         data: {
           name: deviceData.name,
+          type: deviceData.type,
           serialNumber: deviceData.serialNumber,
-          description: deviceData.description,
-          status: deviceData.status,
-          categoryId: deviceData.categoryId,
-          manufacturer: deviceData.manufacturer,
+          brand: deviceData.brand,
           model: deviceData.model,
+          configuration: deviceData.configuration,
           purchaseDate: deviceData.purchaseDate,
-          warrantyEnd: deviceData.warrantyEnd,
+          purchaseValue: deviceData.purchaseValue,
+          invoiceNumber: deviceData.invoiceNumber,
+          vendor: deviceData.vendor,
+          condition: deviceData.condition,
+          remarks: deviceData.remarks,
+          status: deviceData.status || "ACTIVE",
         },
       });
 
@@ -142,6 +146,24 @@ export async function updateDevice(data: Device, id: string) {
     const device = deviceCateorySchema.parse(data);
 
     await prisma.$transaction(async (tx) => {
+      await tx.device.update({
+        where: { id },
+        data: {
+          name: device.name,
+          type: device.type,
+          serialNumber: device.serialNumber,
+          brand: device.brand,
+          model: device.model,
+          configuration: device.configuration,
+          purchaseDate: device.purchaseDate,
+          purchaseValue: device.purchaseValue,
+          invoiceNumber: device.invoiceNumber,
+          vendor: device.vendor,
+          condition: device.condition,
+          remarks: device.remarks,
+        },
+      });
+
       await tx.device.update({
         where: { id },
         data: {

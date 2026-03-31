@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Button } from '../ui/button';
 import { ArrowRight, Loader } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Status } from '@/lib/generated/prisma/enums';
+import { Status } from '@prisma/client';
 
 const DeviceCategoryForm = ({ data, update = false }: { data?: DeviceCategory, update: boolean }) => {
     const router = useRouter()

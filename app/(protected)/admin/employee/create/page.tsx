@@ -3,16 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { getDepartment } from "@/lib/actions/department";
 import { getDesignation } from "@/lib/actions/designation";
-import { getLocation } from "@/lib/actions/location";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions, canAccess } from "@/lib/rbac";
 
-
-
 const EmployeeCreatePage = async () => {
   const session = await auth();
+
   if (!session?.user?.email) {
     redirect("/sign-in");
   }
@@ -25,8 +23,10 @@ const EmployeeCreatePage = async () => {
   }
 
   const departments = await getDepartment();
-  const designations = await getDesignation();
+  const designationsRes = await getDesignation();
 
+  // 🔥 handle both cases (array OR {data})
+  const designations = (designationsRes as any)?.data || designationsRes;
 
   return (
     <Card>
@@ -44,7 +44,7 @@ const EmployeeCreatePage = async () => {
         <EmployeeForm
           update={false}
           departments={departments}
-          designations={designations}
+          designations={designations}   // ✅ FIXED
         />
       </CardContent>
     </Card>

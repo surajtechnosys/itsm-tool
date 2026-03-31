@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { getDepartment } from "@/lib/actions/department";
 import { getEmployeeById } from "@/lib/actions/employee";
-import { getLocation } from "@/lib/actions/location";
+import { getDesignation } from "@/lib/actions/designation";
 import { Employee } from "@/types";
 import Link from "next/link";
 import { auth } from "@/auth";
@@ -15,8 +15,7 @@ const EmployeeEditPage = async ({
 }: {
   params: Promise<{ id: string }>;
 }) => {
-  const { id } = await params;  
-
+  const { id } = await params;
 
   const session = await auth();
   if (!session?.user?.email) {
@@ -31,12 +30,15 @@ const EmployeeEditPage = async ({
   }
 
   const res = await getEmployeeById(id);
+
   if (!res?.data) {
     redirect("/404");
   }
 
   const departments = await getDepartment();
-  const locations = await getLocation();
+  const designationsRes = await getDesignation();
+
+  const designations = (designationsRes as any)?.data || designationsRes;
 
   return (
     <Card>
@@ -52,10 +54,10 @@ const EmployeeEditPage = async ({
 
       <CardContent>
         <EmployeeForm
-          data={res.data as Employee}
+          data={res.data as unknown as Employee}
           update={true}
           departments={departments}
-          locations={locations as any}
+          designations={designations}   // ✅ FIXED
         />
       </CardContent>
     </Card>

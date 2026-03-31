@@ -7,7 +7,7 @@ import { z } from "zod";
 import React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Status } from "@/lib/generated/prisma/enums";
+import { Status } from "@prisma/client";
 
 import {
   Form, FormField, FormItem, FormLabel,

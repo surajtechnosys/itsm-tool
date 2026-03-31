@@ -1,8 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { EditIcon, Info, Trash } from "lucide-react";
-import { format } from "date-fns";
+import { EditIcon, Trash } from "lucide-react";
 import Link from "next/link";
 import { Device } from "@/types";
 
@@ -19,65 +18,30 @@ export const getDeviceColumns = ({
 }: Props): ColumnDef<Device>[] => [
   {
     accessorKey: "name",
-    header: "Name",
+    header: "Asset Name",
+  },
+  {
+    accessorKey: "type",
+    header: "Asset Type",
   },
   {
     accessorKey: "serialNumber",
-    header: "Serial Number",
+    header: "Serial No",
   },
   {
-    accessorKey: "manufacturer",
-    header: "Manufacturer",
-  },
-  {
-    accessorKey: "purchaseDate",
-    header: "Purchased Date",
-    cell: ({ row }) => {
-      const value = row.original.purchaseDate;
-      return value ? format(new Date(value), "PPP") : "-";
-    },
-  },
-  {
-    accessorKey: "warrantyEnd",
-    header: "Warranty End",
-    cell: ({ row }) => {
-      const value = row.original.warrantyEnd;
-      return value ? format(new Date(value), "PPP") : "-";
-    },
+    accessorKey: "condition",
+    header: "Condition",
   },
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
       const status = row.original.status;
-
-      return status === "ACTIVE" ? (
-        <Badge className="bg-green-500 hover:bg-green-500">{status}</Badge>
-      ) : (
-        <Badge variant="destructive">{status}</Badge>
+      return (
+        <Badge className="bg-green-500 hover:bg-green-500">
+          {status || "ACTIVE"}
+        </Badge>
       );
-    },
-  },
-  {
-    accessorKey: "deviceState",
-    header: "State",
-    cell: ({ row }) => {
-      const state = row.original.deviceState;
-
-      switch (state) {
-        case "AVAILABLE":
-          return <Badge className="bg-green-500">AVAILABLE</Badge>;
-        case "ASSIGNED":
-          return <Badge className="bg-blue-500">ASSIGNED</Badge>;
-        case "REPAIR":
-          return <Badge className="bg-yellow-500 text-black">REPAIR</Badge>;
-        case "REPAIRING":
-          return <Badge className="bg-orange-500">REPAIRING</Badge>;
-        case "RETIRED":
-          return <Badge variant="destructive">RETIRED</Badge>;
-        default:
-          return state || "-";
-      }
     },
   },
   {
@@ -90,14 +54,6 @@ export const getDeviceColumns = ({
 
       return (
         <div className="flex gap-2">
-          {/* VIEW */}
-          <Button asChild variant="secondary" size="icon">
-            <Link href={`/admin/device/${device.id}/history`}>
-              <Info className="h-4 w-4" />
-            </Link>
-          </Button>
-
-          {/* EDIT */}
           {canEdit && (
             <Button asChild className="bg-orange-500 hover:bg-orange-600" size="icon">
               <Link href={`/admin/device/edit/${device.id}`}>
@@ -106,7 +62,6 @@ export const getDeviceColumns = ({
             </Button>
           )}
 
-          {/* DELETE */}
           {canDelete && (
             <Button
               variant="destructive"

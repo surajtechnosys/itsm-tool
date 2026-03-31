@@ -21,7 +21,7 @@ import {
 } from "../ui/select";
 import { createEmployee, updateEmployee } from "@/lib/actions/employee";
 import { useRouter } from "next/navigation";
-import { Status } from "@/lib/generated/prisma/enums";
+import { Status } from "@prisma/client";
 
 export default function EmployeeForm({
   data,

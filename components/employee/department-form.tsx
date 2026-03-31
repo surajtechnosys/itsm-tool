@@ -27,7 +27,7 @@ import {
 import { Button } from "../ui/button";
 import { ArrowRight, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Status } from "@/lib/generated/prisma/enums";
+import { Status } from "@prisma/client";
 import { createDepartment, updateDepartment } from "@/lib/actions/department";
 
 type FormValues = z.infer<typeof departmentSchema>;

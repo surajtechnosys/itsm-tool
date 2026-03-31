@@ -1,5 +1,5 @@
-import z from "zod";
-import { AssignedDeviceStatus, Status, VendorStatus } from "./generated/prisma/enums";
+import { z } from "zod";
+import { AssignedDeviceStatus, Status, VendorStatus } from "@prisma/client";
 
 export const statusEnum = z.enum(["ACTIVE", "INACTIVE"]);
 
@@ -101,10 +101,9 @@ export const employeeSchema = z.object({
   phoneNumber: z.string().min(1, "Employee phone number is required"),
   dateOfBirth: z.date().nullable().optional(),
   hireDate: z.date().nullable().optional(),
-  salary: z.string().min(1, "Employee salary is required"),
   status: z.enum(Object.values(Status)),
   departmentId: z.string().min(1, "Department is required"),
-  locationId: z.string().min(1, "Location is required"),
+  designationId: z.string().nullable().optional(), 
   createdAt: z.date().nullable().optional(),
   updatedAt: z.date().nullable().optional(),
 });
