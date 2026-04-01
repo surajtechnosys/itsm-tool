@@ -2,7 +2,7 @@ import DeviceAssignedForm from '@/components/device/assigned-device-form'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
-import { getDevice } from '@/lib/actions/device-action'
+import { getDevice } from '@/lib/actions/asset-action'
 import { getDeviceAssignedById } from '@/lib/actions/device-assigned-action'
 import { getEmployee } from '@/lib/actions/employee'
 

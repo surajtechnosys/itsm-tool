@@ -29,7 +29,7 @@ import {
 import { createPurchaseOrder } from "@/lib/actions/purchase-order";
 import { getRequirement } from "@/lib/actions/requirements";
 import { getVendors } from "@/lib/actions/vendor";
-import { getDeviceCategory } from "@/lib/actions/device-category-action";
+import { getDeviceCategory } from "@/lib/actions/asset-type-action";
 import { useRouter } from "next/navigation";
 
 

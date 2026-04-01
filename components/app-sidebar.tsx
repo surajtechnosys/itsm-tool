@@ -49,18 +49,23 @@ const data = {
       icon: PieChart,
     },
     {
-      title: "Device",
-      url: "/admin/device",
+      title: "Assets",
+      url: "/admin/asset",
       icon: Laptop2Icon,
       items: [
         {
-          title: "Device",
-          url: "/admin/device",
+          title: "Assets",
+          url: "/admin/asset",
           icon: Laptop2Icon,
         },
         {
-          title: "Device Category",
-          url: "/admin/device-category",
+          title: "Asset Types",
+          url: "/admin/asset-type",
+          icon: ComputerIcon,
+        },
+        {
+          title: "Accessory Types",
+          url: "/admin/accessory-type",
           icon: ComputerIcon,
         },
         {

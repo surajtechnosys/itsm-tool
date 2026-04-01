@@ -1,6 +1,5 @@
 import {
   AssignedDeviceStatus,
-  DeviceStatus,
   Status,
   VendorStatus,
 } from "@prisma/client";
@@ -34,7 +33,7 @@ export const moduleDefaultValues = {
   status: Status.ACTIVE,
 };
 
-export const deviceCategoryDefaultValues = {
+export const assetTypeDefaultValues = {
   name: "",
   description: "",
   status: Status.ACTIVE,
@@ -46,17 +45,36 @@ export const departmentDefaultValues = {
   status: Status.ACTIVE,
 };
 
-export const deviceDefaultValues = {
+export const accessoryTypeDefaultValues = {
   name: "",
-  serialNumber: "",
   description: "",
-  status: DeviceStatus.ACTIVE,
-  deviceState: "AVAILABLE",
-  categoryId: "",
-  manufacturer: "",
+  status: Status.ACTIVE,
+};
+
+
+export const assetDefaultValues = {
+  name: "",
+  assetTypeId: "",
+  serialNumber: "",
+
+  brand: "",
   model: "",
+  configuration: "",
+
   purchaseDate: null,
-  warrantyEnd: null,
+  purchaseValue: undefined,
+
+  invoiceNumber: "",
+  vendor: "",
+
+  status: "ACTIVE" as Status,
+  condition: "Good",
+
+  hasWarranty: false,
+
+  remarks: "",
+
+  accessories: [],
 };
 
 export const employeeDefaultValues = {

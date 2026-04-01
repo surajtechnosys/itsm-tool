@@ -4,15 +4,6 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { prisma } from "@/lib/db/prisma-helper";
 import { getConfiguration } from "@/lib/actions/configuration";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
@@ -47,8 +38,9 @@ export default async function RootLayout({
   const allowedRoutes =
     dbUser?.role?.roleModules?.map((rm) => rm.module.route) || []
       ? [
-          "/admin/device",
-          "/admin/device-category",
+          "/admin/asset",
+          "/admin/asset-type",
+          "/admin/accessory",
           "/admin/device-assigned",
           "/admin/vendor",
           "/admin/requirements",

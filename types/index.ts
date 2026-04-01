@@ -1,7 +1,6 @@
 import {
     departmentSchema,
-    deviceCateorySchema,
-    deviceSchema,
+    assetSchema,
     employeeSchema,
     locationSchema,
     moduleSchema,
@@ -11,7 +10,8 @@ import {
     vendorSchema,
     requriementsSchema,
     configurationSchema,
-    procurementSchema
+    procurementSchema,
+    assetTypeSchema
 } from "@/lib/validators";
 
 import z from "zod";
@@ -27,8 +27,8 @@ export type Role = {
   updatedAt?: string | null;
 };
 export type Module = z.infer<typeof moduleSchema>
-export type DeviceCategory = z.infer<typeof deviceCateorySchema>
-export type Device = z.infer<typeof deviceSchema>
+export type AssetType = z.infer<typeof assetTypeSchema>
+export type Device = z.infer<typeof assetSchema>
 export type Department = z.infer<typeof departmentSchema>
 export type Location = z.infer<typeof locationSchema>
 export type Employee = z.infer<typeof employeeSchema>
@@ -37,6 +37,12 @@ export type Vendor = z.infer<typeof vendorSchema>
 export type Requirement = z.infer<typeof requriementsSchema>
 export type Configuration = z.infer<typeof configurationSchema>
 export type Procurement = z.infer<typeof procurementSchema>
+export type AccessoryType = {
+  id?: string;
+  name: string;
+  description?: string;
+  status: "ACTIVE" | "INACTIVE";
+};
 
 
 

@@ -43,37 +43,67 @@ export const moduleSchema = z.object({
   updatedAt: z.string().nullable().optional(),
 });
 
-// deviceCategory schema
-export const deviceCateorySchema = z.object({
+// assetType schema
+export const assetTypeSchema = z.object({
   id: z.string().optional(),
-  name: z.string().min(1, "Device Category name is required"),
-  description: z.string().min(1, "Device Category description is required"),
+  name: z.string().min(1, "Asset Type name is required"),
+  description: z.string().min(1, "Asset Type description is required"),
   status: z.enum(Object.values(Status)),
   createdAt: z.date().nullable().optional(),
   updatedAt: z.date().nullable().optional(),
 });
 
-// device schema
-export const deviceSchema = z.object({
+//accessory type schema
+export const accessoryTypeSchema = z.object({
   id: z.string().optional(),
-  name: z.string().min(1, "Device name is required"),
-  serialNumber: z.string().min(1, "Device serial number is required"),
-  description: z.string().min(1, "Device description is required"),
-  status: z.enum(Object.values(Status)),
-  deviceState: z.enum([
-  "AVAILABLE",
-  "ASSIGNED",
-  "REPAIR",
-  "REPAIRING",
-  "RETIRED"
-]).optional().default("AVAILABLE"),
-  categoryId: z.string().min(1, "Device categoryid is required"),
-  manufacturer: z.string().min(1, "Device manufacturer is required"),
-  model: z.string().min(1, "Device model is required"),
-  purchaseDate: z.date().nullable(),
-  warrantyEnd: z.date().nullable(),
-  createdAt: z.date().nullable().optional(),
-  updatedAt: z.date().nullable().optional(),
+  name: z.string().min(1, "Accessory Type name is required"),
+  description: z.string().optional(),
+  status: z.nativeEnum(Status),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+});
+
+// asset schema
+export const assetSchema = z.object({
+  id: z.string().optional(),
+
+  // Core
+  name: z.string().min(1, "Asset name is required"),
+  assetTypeId: z.string().min(1, "Asset Type is required"),
+  serialNumber: z.string().optional(),
+
+  // Details
+  brand: z.string().optional(),
+  model: z.string().optional(),
+  configuration: z.string().optional(),
+
+  // Purchase
+  purchaseDate: z.coerce.date().optional().nullable(),
+  purchaseValue: z.coerce.number().optional(),
+  invoiceNumber: z.string().optional(),
+  vendor: z.string().optional(),
+
+  // Status & condition
+  status: z.enum(Object.values(Status)).optional(),
+  condition: z.string().optional(),
+  hasWarranty: z.boolean().default(false),
+
+  // Extra
+  remarks: z.string().optional(),
+
+  // Accessories (IMPORTANT)
+  accessories: z.array(
+    z.object({
+      type: z.string().min(1, "Accessory type required"),
+      make: z.string().optional(),
+      model: z.string().optional(),
+      serialNo: z.string().optional(),
+      condition: z.string().min(1),
+    })
+  ).optional(),
+
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
 });
 
 // department schema

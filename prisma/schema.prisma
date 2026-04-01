@@ -153,61 +153,70 @@ model RoleModule {
   @@unique([roleId, moduleId])
 }
 
-model DeviceCategory {
-  id                 String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name               String              @unique(map: "device_category_name_idx")
-  purchaseOrderItems PurchaseOrderItem[]
-  description        String
-  status             Status              @default(ACTIVE)
 
-  device Device[]
-
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  updatedAt DateTime @updatedAt @db.Timestamp(6)
-}
-
-model Device {
-  id           String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+model Asset {
+  id String @id @default(uuid()) @db.Uuid 
   name         String
-  serialNumber String  @unique
-  description  String?
-  deviceState DeviceState @default(AVAILABLE)
-  
+  serialNumber String?
 
-  status DeviceStatus @default(ACTIVE)
-
-  categoryId String         @db.Uuid
-  category   DeviceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  manufacturer String?
+  brand        String?
   model        String?
-  purchaseDate DateTime?
-  warrantyEnd  DateTime?
+  configuration String?
 
+  purchaseDate DateTime?
+  purchaseValue Float?
+  invoiceNumber String?
+  vendor       String?
+
+  hasWarranty  Boolean @default(false)
+  condition    String?
+  remarks      String?
+
+  accessories  Accessory[]
   device DeviceAssigned[]
-  histories   DeviceHistory[]
+  notifications Notification[]
+
+  assetTypeId  String?
+  assetType    AssetType? @relation(fields: [assetTypeId], references: [id])
+
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@index([categoryId])
-  @@index([status])
-  @@index([deviceState])
-  deviceRepairs DeviceRepair[]
-  notifications Notification[]
 }
 
+model Accessory {
+  id        String @id @default(uuid()) @db.Uuid
 
-model DeviceHistory {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  deviceId    String   @db.Uuid
-  employeeId  String?  @db.Uuid
-  actionType  String
-  notes       String?
+  type      String
+  make      String?
+  model     String?
+  serialNo  String?
+  condition String
+
+  assetId   String @db.Uuid   // ✅ MUST BE THIS
+  asset     Asset  @relation(fields: [assetId], references: [id], onDelete: Cascade)
+}
+
+model AccessoryType {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  status      Status   @default(ACTIVE)
   createdAt   DateTime @default(now())
-
-  device      Device   @relation(fields: [deviceId], references: [id])
+  updatedAt   DateTime @updatedAt
 }
+
+model AssetType {
+  id          String   @id @default(cuid())
+  name        String
+  description String?   // ✅ ADD THIS
+  status      Status    @default(ACTIVE)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+
+  assets      Asset[]
+}
+
 
 model Department {
   id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -247,21 +256,7 @@ model Location {
   @@index([code])
 }
 
-model DeviceRepair {
-  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  deviceId      String   @db.Uuid
-  vendor        String
-  cost          Float
-  notes         String?
-  repairDate    DateTime?
 
-  status        String   @default("REPAIRING")
-
-  createdAt     DateTime @default(now())
-  completedAt   DateTime?
-
-  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
-}
 
 model Notification {
   id          String   @id @default(uuid())
@@ -272,8 +267,8 @@ model Notification {
 
   triggerDay  Int?
 
-  deviceId    String?  @db.Uuid
-  device      Device?  @relation(fields: [deviceId], references: [id])
+  assetId    String?  @db.Uuid
+  asset      Asset?  @relation(fields: [assetId], references: [id])
 
   createdAt   DateTime @default(now())
 }
@@ -316,8 +311,8 @@ model DeviceAssigned {
   status  AssignedDeviceStatus @default(NOTASSIGNED)
   remarks String
 
-  deviceId String @db.Uuid
-  device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  assetId String @db.Uuid
+  asset   Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
 
   employeeId String   @db.Uuid
   employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
@@ -325,7 +320,7 @@ model DeviceAssigned {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([deviceId])
+  @@index([assetId])
   @@index([employeeId])
 }
 
@@ -455,7 +450,6 @@ model PurchaseOrderItem {
   totalPrice       Float
 
   purchaseOrder  PurchaseOrder  @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
-  deviceCategory DeviceCategory @relation(fields: [deviceCategoryId], references: [id], onDelete: Cascade)
 
   @@index([purchaseOrderId])
   @@index([deviceCategoryId])

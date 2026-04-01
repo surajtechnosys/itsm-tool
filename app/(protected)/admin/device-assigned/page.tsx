@@ -5,7 +5,7 @@ import React from "react";
 import DeviceAssignedTable from "./device-assigned-table";
 
 import { getAssignedDevices } from "@/lib/actions/device-assigned-action";
-import { getDevice } from "@/lib/actions/device-action";
+import { getDevice } from "@/lib/actions/asset-action";
 import { getEmployee } from "@/lib/actions/employee";
 
 import { Device, Employee } from "@/types";
