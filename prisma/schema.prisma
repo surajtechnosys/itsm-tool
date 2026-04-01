@@ -54,28 +54,27 @@ enum NotificationType {
   DEVICE_RETURN
 }
 
-
 model User {
-  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  username      String    @unique
-  email         String    @unique(map: "user_email_idx")
+  username String @unique
+  email    String @unique(map: "user_email_idx")
 
-  firstName     String
-  lastName      String
+  firstName String
+  lastName  String
 
   emailVerified DateTime?
   password      String
 
-  roleId        String    @db.Uuid
+  roleId String @db.Uuid
 
-  accounts      Account[]
-  sessions      Session[]
+  accounts Account[]
+  sessions Session[]
 
-  role          Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
-  createdAt     DateTime  @default(now()) @db.Timestamp(6)
-  updatedAt     DateTime  @updatedAt @db.Timestamp(6)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
 }
 
 model Account {
@@ -126,7 +125,7 @@ model Module {
   id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String @unique(map: "module_name_idx")
   description String
-  route       String @unique  
+  route       String @unique
   status      Status @default(ACTIVE)
 
   roleModules RoleModule[]
@@ -135,66 +134,71 @@ model Module {
   updatedAt DateTime @updatedAt @db.Timestamp(6)
 }
 
-
 model RoleModule {
-  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  roleId    String @db.Uuid
-  moduleId  String @db.Uuid
+  roleId   String @db.Uuid
+  moduleId String @db.Uuid
 
   canView   Boolean @default(true)
   canCreate Boolean @default(false)
   canEdit   Boolean @default(false)
   canDelete Boolean @default(false)
 
-  role      Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  module    Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 
   @@unique([roleId, moduleId])
 }
 
-
 model Asset {
-  id String @id @default(uuid()) @db.Uuid 
+  id           String  @id @default(uuid()) @db.Uuid
   name         String
   serialNumber String?
 
-  brand        String?
-  model        String?
+  brand         String?
+  model         String?
   configuration String?
 
-  purchaseDate DateTime?
+  purchaseDate  DateTime?
   purchaseValue Float?
   invoiceNumber String?
-  vendor       String?
+  vendor        String?
 
-  hasWarranty  Boolean @default(false)
-  condition    String?
-  remarks      String?
+  hasWarranty Boolean @default(false)
+  condition   String?
+  remarks     String?
 
-  accessories  Accessory[]
-  device DeviceAssigned[]
+  warrantyStartDate DateTime?
+  warrantyEndDate   DateTime?
+  warrantyDuration  Int?
+  warrantyProvider  String?
+  warrantyType      String?
+
+  accessories   Accessory[]
+  device        DeviceAssigned[]
   notifications Notification[]
 
-  assetTypeId  String?
-  assetType    AssetType? @relation(fields: [assetTypeId], references: [id])
-
+  assetTypeId String?
+  assetType   AssetType? @relation(fields: [assetTypeId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Accessory {
-  id        String @id @default(uuid()) @db.Uuid
+  id String @id @default(uuid()) @db.Uuid
 
-  type      String
+  accessoryTypeId String?
+  accessoryType   AccessoryType? @relation(fields: [accessoryTypeId], references: [id])
+
   make      String?
   model     String?
   serialNo  String?
   condition String
 
-  assetId   String @db.Uuid   // ✅ MUST BE THIS
-  asset     Asset  @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  assetId String @db.Uuid
+  asset   Asset  @relation(fields: [assetId], references: [id], onDelete: Cascade)
 }
 
 model AccessoryType {
@@ -204,76 +208,73 @@ model AccessoryType {
   status      Status   @default(ACTIVE)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  accessories Accessory[] // ✅ FIXED
 }
 
 model AssetType {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
-  description String?   // ✅ ADD THIS
+  description String? // ✅ ADD THIS
   status      Status    @default(ACTIVE)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime? @updatedAt
 
-  assets      Asset[]
+  assets Asset[]
 }
 
-
 model Department {
-  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  name        String     @unique(map: "department_name_idx")
-  code        String     @unique(map: "department_code_idx")  // ✅ ADD THIS
+  name String @unique(map: "department_name_idx")
+  code String @unique(map: "department_code_idx") // ✅ ADD THIS
 
   description String
-  status      Status     @default(ACTIVE)
+  status      Status @default(ACTIVE)
 
-  employee    Employee[]
+  employee Employee[]
 
-  createdAt   DateTime   @default(now()) @db.Timestamp(6)
-  updatedAt   DateTime   @updatedAt @db.Timestamp(6)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
 
   @@index([status])
   @@index([code])
 }
 
 model Location {
-  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name              String   @unique(map: "location_name_idx")
-  code              String   @unique(map: "location_code_idx")
+  id                String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String  @unique(map: "location_name_idx")
+  code              String  @unique(map: "location_code_idx")
   address           String
   city              String
   state             String
   country           String
   pincode           String
-  hasMultipleFloors Boolean  @default(false)
-  status            Status   @default(ACTIVE)
-  
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  hasMultipleFloors Boolean @default(false)
+  status            Status  @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([status])
   @@index([city])
   @@index([code])
 }
 
-
-
 model Notification {
-  id          String   @id @default(uuid())
-  title       String
-  message     String
-  type        NotificationType   // ✅ must use enum
-  isRead      Boolean  @default(false)
+  id      String           @id @default(uuid())
+  title   String
+  message String
+  type    NotificationType // ✅ must use enum
+  isRead  Boolean          @default(false)
 
-  triggerDay  Int?
+  triggerDay Int?
 
-  assetId    String?  @db.Uuid
-  asset      Asset?  @relation(fields: [assetId], references: [id])
+  assetId String? @db.Uuid
+  asset   Asset?  @relation(fields: [assetId], references: [id])
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 }
-
-
 
 model Employee {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -289,7 +290,7 @@ model Employee {
   departmentId String     @db.Uuid
   department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
 
-  designationId String?   @db.Uuid
+  designationId String?      @db.Uuid
   designation   Designation? @relation(fields: [designationId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
@@ -306,13 +307,13 @@ model DeviceAssigned {
 
   assignedDate DateTime  @default(now()) @db.Timestamp(6)
   returnedDate DateTime?
-  damage String?
+  damage       String?
 
   status  AssignedDeviceStatus @default(NOTASSIGNED)
   remarks String
 
   assetId String @db.Uuid
-  asset   Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  asset   Asset  @relation(fields: [assetId], references: [id], onDelete: Cascade)
 
   employeeId String   @db.Uuid
   employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
@@ -325,20 +326,20 @@ model DeviceAssigned {
 }
 
 model Designation {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  name        String   @unique(map: "designation_name_idx")
-  code        String   @unique(map: "designation_code_idx")
+  name String @unique(map: "designation_name_idx")
+  code String @unique(map: "designation_code_idx")
 
   level       Int
   description String
 
-  status      Status   @default(ACTIVE)
+  status Status @default(ACTIVE)
 
-  employee    Employee[]
+  employee Employee[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([status])
   @@index([code])
@@ -348,7 +349,7 @@ model Vendor {
   id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   vendorCode     String          @unique
   purchaseOrders PurchaseOrder[]
-  quotations Quotation[]
+  quotations     Quotation[]
   name           String
   contactPerson  String?
   phone          String?
@@ -371,7 +372,7 @@ model Requirement {
   id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   manufatured       String
   purchaseOrders    PurchaseOrder[]
-  quotations Quotation[]
+  quotations        Quotation[]
   model             String
   configuration     Json?
   warranty          String
@@ -401,10 +402,10 @@ model Procurement {
 }
 
 model Configuration {
-  id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name     String?
-  logo     String?
-  favicon  String?
+  id      String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name    String?
+  logo    String?
+  favicon String?
 
   smtpHost     String
   smtpPort     Int
@@ -449,14 +450,14 @@ model PurchaseOrderItem {
   unitPrice        Float
   totalPrice       Float
 
-  purchaseOrder  PurchaseOrder  @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
 
   @@index([purchaseOrderId])
   @@index([deviceCategoryId])
 }
 
 model Quotation {
-  id            String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
   vendorId      String @db.Uuid
   requirementId String @db.Uuid
@@ -474,11 +475,11 @@ model Quotation {
 
   status QuotationStatus @default(PENDING)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  vendor      Vendor      @relation(fields: [vendorId], references: [id])
+  requirement Requirement @relation(fields: [requirementId], references: [id])
 
   @@index([vendorId])
   @@index([requirementId])
-   vendor      Vendor      @relation(fields: [vendorId], references: [id])
-  requirement Requirement @relation(fields: [requirementId], references: [id])
 }

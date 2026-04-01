@@ -2,7 +2,7 @@
 
 import { assetDefaultValues } from "@/lib/constants";
 import { assetSchema } from "@/lib/validators";
-import { Asset } from "@/types";
+import { AssetType } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { SubmitHandler, useForm, useFieldArray } from "react-hook-form";
@@ -12,6 +12,7 @@ import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
+import { getAccessoryType } from "@/lib/actions/accessory-type-action";
 import {
   Select,
   SelectContent,
@@ -28,14 +29,14 @@ const AssetForm = ({
   data,
   update = false,
 }: {
-  data?: Asset;
+  data?: AssetType;
   update: boolean;
 }) => {
   const router = useRouter();
   const id = data?.id;
 
   const form = useForm<z.infer<typeof assetSchema>>({
-    resolver: zodResolver(assetSchema),
+    resolver: zodResolver(assetSchema) as any,
     defaultValues: (data ?? assetDefaultValues) as any,
   });
 
@@ -56,6 +57,16 @@ const AssetForm = ({
     load();
   }, []);
 
+  const [accessoryTypes, setAccessoryTypes] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    const loadAccessory = async () => {
+      const res = await getAccessoryType();
+      setAccessoryTypes(res);
+    };
+    loadAccessory();
+  }, []);
+
   const onSubmit: SubmitHandler<any> = async (values) => {
     startTransition(async () => {
       let res;
@@ -71,9 +82,16 @@ const AssetForm = ({
     });
   };
 
+  const hasWarranty = form.watch("hasWarranty");
+
   return (
     <Form {...form}>
-      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        className="space-y-4"
+        onSubmit={form.handleSubmit(onSubmit, (errors) =>
+          console.log("FORM ERRORS:", errors),
+        )}
+      >
         <div className="grid grid-cols-3 gap-4">
           <FormField
             control={form.control}
@@ -177,7 +195,11 @@ const AssetForm = ({
                 <FormControl>
                   <Input
                     type="date"
-                    value={field.value ? new Date(field.value).toISOString().slice(0, 10) : ""}
+                    value={
+                      field.value
+                        ? new Date(field.value).toISOString().slice(0, 10)
+                        : ""
+                    }
                     onChange={(e) => field.onChange(e.target.value)}
                   />
                 </FormControl>
@@ -253,13 +275,131 @@ const AssetForm = ({
           )}
         />
 
+        {hasWarranty && (
+          <div className="grid grid-cols-5 gap-4 border p-4 rounded">
+            <FormField
+              control={form.control}
+              name="warrantyStartDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Warranty Start Date</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="date"
+                      value={
+                        field.value
+                          ? new Date(field.value).toISOString().slice(0, 10)
+                          : ""
+                      }
+                      onChange={(e) => field.onChange(e.target.value)}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="warrantyEndDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Warranty End Date</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="date"
+                      value={
+                        field.value
+                          ? new Date(field.value).toISOString().slice(0, 10)
+                          : ""
+                      }
+                      onChange={(e) => field.onChange(e.target.value)}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="warrantyDuration"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Duration (Months)</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value ?? ""} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="warrantyProvider"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Warranty Provider</FormLabel>
+                  <FormControl>
+                    <Input {...field} value={field.value ?? ""} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="warrantyType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Warranty Type</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value ?? ""}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Standard">Standard</SelectItem>
+                      <SelectItem value="Extended">Extended</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+          </div>
+        )}
+
         {/* ACCESSORIES */}
         <div className="border p-4 rounded">
           {fields.map((item, index) => (
             <div key={item.id} className="grid grid-cols-6 gap-2 mb-2">
-              <Input
-                {...form.register(`accessories.${index}.type` as const)}
-                placeholder="Type"
+              <FormField
+                control={form.control}
+                name={`accessories.${index}.accessoryTypeId`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value ?? ""}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Accessory Type" />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                          {accessoryTypes.map((item) => (
+                            <SelectItem key={item.id} value={item.id}>
+                              {item.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </FormItem>
+                )}
               />
               <Input
                 {...form.register(`accessories.${index}.make` as const)}

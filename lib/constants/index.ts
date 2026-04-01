@@ -1,8 +1,4 @@
-import {
-  AssignedDeviceStatus,
-  Status,
-  VendorStatus,
-} from "@prisma/client";
+import { AssignedDeviceStatus, Status, VendorStatus } from "@prisma/client";
 
 export const APP_NAME =
   process.env.NEXT_APP_APP_NAME ?? "Asset Management System";
@@ -51,7 +47,6 @@ export const accessoryTypeDefaultValues = {
   status: Status.ACTIVE,
 };
 
-
 export const assetDefaultValues = {
   name: "",
   assetTypeId: "",
@@ -71,6 +66,11 @@ export const assetDefaultValues = {
   condition: "Good",
 
   hasWarranty: false,
+  warrantyStartDate: null,
+  warrantyEndDate: null,
+  warrantyDuration: "",
+  warrantyProvider: "",
+  warrantyType: "",
 
   remarks: "",
 

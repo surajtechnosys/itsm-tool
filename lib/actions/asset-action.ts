@@ -23,6 +23,7 @@ export async function getAsset(): Promise<AssetType[]> {
 
 // ✅ CREATE ASSET
 export async function createAsset(data: AssetType) {
+  
   const session = await auth();
 
   if (!session?.user?.email) throw new Error("Unauthorized");
@@ -51,6 +52,11 @@ export async function createAsset(data: AssetType) {
         condition: assetData.condition,
         hasWarranty: assetData.hasWarranty,
         remarks: assetData.remarks,
+        warrantyStartDate: assetData.warrantyStartDate,
+        warrantyEndDate: assetData.warrantyEndDate,
+        warrantyDuration: assetData.warrantyDuration,
+        warrantyProvider: assetData.warrantyProvider,
+        warrantyType: assetData.warrantyType,
 
         // ✅ ACCESSORIES
         accessories: {

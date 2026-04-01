@@ -1,6 +1,6 @@
 "use client";
 
-import { createAccessoryType, updateAccessoryType } from '@/lib/actions/accessory-type-action'
+import { createAccessoryType,  updateAccessoryType } from '@/lib/actions/accessory-type-action'
 import { accessoryTypeDefaultValues } from '@/lib/constants'
 import { accessoryTypeSchema, assetTypeSchema } from '@/lib/validators';
 import { AccessoryType } from '@/types';
@@ -17,6 +17,7 @@ import { Button } from '../ui/button';
 import { ArrowRight, Loader } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Status } from '@prisma/client';
+import { updateAssetType } from '@/lib/actions/asset-type-action';
 
 const AccessoryTypeForm = ({ data, update = false }: { data?: AccessoryType, update: boolean }) => {
     const router = useRouter()
@@ -29,15 +30,15 @@ const AccessoryTypeForm = ({ data, update = false }: { data?: AccessoryType, upd
 
     const [isPending, startTransition] = React.useTransition()
 
-    const onSubmit: SubmitHandler<z.infer<typeof assetTypeSchema>> = async (values: any) => {
+    const onSubmit: SubmitHandler<z.infer<typeof accessoryTypeSchema>> = async (values: any) => {
 
         startTransition(async () => {
             let res;
 
             if (update && id) {
-                res = await updateAssetType(values, id)
+                res = await updateAccessoryType(values, id)
             } else {
-                res = await createAssetType(values)
+                res = await createAccessoryType(values)
             }
 
             if (!res?.success) {
@@ -45,7 +46,7 @@ const AccessoryTypeForm = ({ data, update = false }: { data?: AccessoryType, upd
                     description: res?.message
                 })
             } else {
-                router.push("/admin/asset-type") // ✅ updated route
+                router.push("/admin/accessory-type") // ✅ updated route
             }
 
         })
@@ -135,4 +136,4 @@ const AccessoryTypeForm = ({ data, update = false }: { data?: AccessoryType, upd
     )
 }
 
-export default AssetTypeForm;
+export default AccessoryTypeForm;

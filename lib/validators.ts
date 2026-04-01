@@ -22,7 +22,6 @@ export const userSchema = z.object({
   updatedAt: z.date().optional(),
 });
 
-
 // role schema
 export const roleSchema = z.object({
   id: z.string().optional(),
@@ -88,19 +87,27 @@ export const assetSchema = z.object({
   condition: z.string().optional(),
   hasWarranty: z.boolean().default(false),
 
+  warrantyStartDate: z.coerce.date().optional().nullable(),
+  warrantyEndDate: z.coerce.date().optional().nullable(),
+  warrantyDuration: z.coerce.number().optional(),
+  warrantyProvider: z.string().optional(),
+  warrantyType: z.string().optional(),
+
   // Extra
   remarks: z.string().optional(),
 
   // Accessories (IMPORTANT)
-  accessories: z.array(
-    z.object({
-      type: z.string().min(1, "Accessory type required"),
-      make: z.string().optional(),
-      model: z.string().optional(),
-      serialNo: z.string().optional(),
-      condition: z.string().min(1),
-    })
-  ).optional(),
+  accessories: z
+    .array(
+      z.object({
+        type: z.string().min(1, "Accessory type required"),
+        make: z.string().optional(),
+        model: z.string().optional(),
+        serialNo: z.string().optional(),
+        condition: z.string().min(1),
+      }),
+    )
+    .optional(),
 
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
@@ -133,11 +140,10 @@ export const employeeSchema = z.object({
   hireDate: z.date().nullable().optional(),
   status: z.enum(Object.values(Status)),
   departmentId: z.string().min(1, "Department is required"),
-  designationId: z.string().nullable().optional(), 
+  designationId: z.string().nullable().optional(),
   createdAt: z.date().nullable().optional(),
   updatedAt: z.date().nullable().optional(),
 });
-
 
 //designation schema
 
@@ -227,7 +233,7 @@ export const requriementsSchema = z.object({
       item: z.string().min(1, "Item required"),
       quantity: z.string().optional(),
       description: z.string().optional(),
-    })
+    }),
   ),
 
   warranty: z.string(),
@@ -254,7 +260,7 @@ export const procurementSchema = z.object({
       item: z.string().min(1, "Item required"),
       quantity: z.string().optional(),
       description: z.string().optional(),
-    })
+    }),
   ),
 
   warranty: z.string(),
@@ -262,7 +268,7 @@ export const procurementSchema = z.object({
   quotationValidity: z.union([z.string(), z.date()]),
   status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
   notes: z.string().optional(),
-   createdAt: z.date().nullable().optional(),
+  createdAt: z.date().nullable().optional(),
   updatedAt: z.date().nullable().optional(),
 });
 
@@ -278,13 +284,13 @@ export const configurationSchema = z.object({
   smtpUser: z.string().min(1),
   smtpPassword: z.string().min(1),
 
-  fromEmail: z.string().email()
-})
+  fromEmail: z.string().email(),
+});
 
 export const purchaseOrderItemSchema = z.object({
   deviceCategoryId: z.string().uuid(),
   quantity: z.number().int().positive(),
-  unitPrice: z.number().nonnegative()
+  unitPrice: z.number().nonnegative(),
 });
 
 export const createPurchaseOrderSchema = z.object({
@@ -292,7 +298,7 @@ export const createPurchaseOrderSchema = z.object({
   vendorId: z.string().uuid(),
   items: z
     .array(purchaseOrderItemSchema)
-    .min(1, "At least one item is required")
+    .min(1, "At least one item is required"),
 });
 
 export const vendorRequestSchema = z.object({
@@ -307,4 +313,3 @@ export const vendorRequestSchema = z.object({
 });
 
 export type VendorRequestInput = z.infer<typeof vendorRequestSchema>;
-
