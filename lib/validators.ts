@@ -185,15 +185,32 @@ export const locationSchema = z.object({
   updatedAt: z.date().optional().nullable(),
 });
 
-// device assigned schema
-export const deviceAssignedSchema = z.object({
+
+export const assignedAssetSchema = z.object({
   id: z.string().optional(),
-  deviceId: z.string(),
-  employeeId: z.string(),
-  remarks: z.string(),
-  status: z.enum(Object.values(AssignedDeviceStatus)),
+
+  // 🔁 renamed
+  assetId: z.string({
+    required_error: "Asset is required",
+  }),
+
+  employeeId: z.string({
+    required_error: "Employee is required",
+  }),
+
+  remarks: z.string().optional().default(""),
+
+  // 🔁 renamed enum
+  status: z.enum(Object.values(AssignmentStatus)),
+
   assignedDate: z.union([z.date(), z.string()]),
-  returnedDate: z.union([z.date(), z.string()]).nullable().optional(),
+
+  // 🔥 important for return flow
+  returnedDate: z
+    .union([z.date(), z.string()])
+    .nullable()
+    .optional(),
+
   createdAt: z.date().nullable().optional(),
   updatedAt: z.date().nullable().optional(),
 });

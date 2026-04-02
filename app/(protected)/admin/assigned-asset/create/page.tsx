@@ -1,60 +1,52 @@
-import DeviceAssignedForm from "@/components/device/assigned-device-form";
+import AssignedAssetForm from "@/components/device/assigned-asset-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { getDevice } from "@/lib/actions/asset-action";
-import { getDeviceAssignedById } from "@/lib/actions/device-assigned-action";
+
+// import { getAssets } from "@/lib/actions/asset-action";
+import { getAsset } from "@/lib/actions/asset-action";
 import { getEmployee } from "@/lib/actions/employee";
-import { Device, Employee } from "@/types";
+
+import { AssetType, Employee } from "@/types";
 import Link from "next/link";
 
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions, canAccess } from "@/lib/rbac";
 
-const DeviceAssignedEditPage = async ({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) => {
-  const { id } = await params;
+const AssignedAssetCreatePage = async () => {
   const session = await auth();
+
   if (!session?.user?.email) {
     redirect("/sign-in");
   }
 
   const user = await getUserPermissions(session.user.email);
-  const route = "/admin/device-assigned";
 
-  if (!canAccess(user, route, "edit")) {
+  const route = "/admin/assigned-asset";
+
+  if (!canAccess(user, route, "create")) {
     redirect("/404");
   }
 
-  const res = await getDeviceAssignedById(id);
-  const devices = await getDevice();
+  const assets = await getAsset();
   const employees = await getEmployee();
-
-
-  if (!res?.success || !res.data) {
-    redirect("/404");
-  }
 
   return (
     <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
-          <h1>Edit Device Assigned</h1>
+          <h1>Create Assigned Asset</h1>
 
           <Button asChild className="bg-blue-500 hover:bg-blue-600">
-            <Link href="/admin/device-assigned">Back</Link>
+            <Link href="/admin/assigned-asset">Back</Link>
           </Button>
         </div>
       </CardHeader>
 
       <CardContent>
-        <DeviceAssignedForm
-          data={res.data}
-          update={true}
-          devices={devices as Device[]}
+        <AssignedAssetForm
+          update={false}
+          assets={assets as AssetType[]}
           employees={employees as Employee[]}
         />
       </CardContent>
@@ -62,4 +54,4 @@ const DeviceAssignedEditPage = async ({
   );
 };
 
-export default DeviceAssignedEditPage;
+export default AssignedAssetCreatePage;

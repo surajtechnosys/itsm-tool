@@ -12,9 +12,8 @@ enum Status {
   INACTIVE
 }
 
-enum AssignedDeviceStatus {
+enum AssignmentStatus {
   ASSIGNED
-  NOTASSIGNED
   RETURNED
 }
 
@@ -152,7 +151,7 @@ model RoleModule {
 }
 
 model Asset {
-  id           String  @id @default(uuid()) @db.Uuid
+  id String @id @default(uuid()) @db.Uuid
   name         String
   serialNumber String?
 
@@ -176,7 +175,7 @@ model Asset {
   warrantyType      String?
 
   accessories   Accessory[]
-  device        DeviceAssigned[]
+  assignedAssets AssignedAsset[]
   notifications Notification[]
 
   assetTypeId String?
@@ -221,6 +220,23 @@ model AssetType {
   updatedAt   DateTime? @updatedAt
 
   assets Asset[]
+}
+
+model AssignedAsset {
+  id          String   @id @default(uuid()) @db.Uuid
+
+  assetId     String   @db.Uuid   
+  employeeId  String   @db.Uuid
+
+  asset       Asset    @relation(fields: [assetId], references: [id])
+  employee    Employee @relation(fields: [employeeId], references: [id])
+
+  status      AssignmentStatus @default(ASSIGNED)
+  assignedAt  DateTime @default(now())
+  returnedAt  DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Department {
@@ -277,7 +293,7 @@ model Notification {
 }
 
 model Employee {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id String @id @default(uuid()) @db.Uuid
   first_name  String
   last_name   String    @unique
   email       String?
@@ -296,33 +312,10 @@ model Employee {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  device DeviceAssigned[]
+  assignedAssets AssignedAsset[]
 
   @@index([departmentId])
   @@index([status])
-}
-
-model DeviceAssigned {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-
-  assignedDate DateTime  @default(now()) @db.Timestamp(6)
-  returnedDate DateTime?
-  damage       String?
-
-  status  AssignedDeviceStatus @default(NOTASSIGNED)
-  remarks String
-
-  assetId String @db.Uuid
-  asset   Asset  @relation(fields: [assetId], references: [id], onDelete: Cascade)
-
-  employeeId String   @db.Uuid
-  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([assetId])
-  @@index([employeeId])
 }
 
 model Designation {

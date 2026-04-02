@@ -1,18 +1,19 @@
-import { ColumnDef } from "@tanstack/react-table"
-import { Button } from "@/components/ui/button"
-import { Info, EditIcon, Trash } from "lucide-react"
-import Link from "next/link"
+import { ColumnDef } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
+import { Info, EditIcon, Trash, RotateCcw } from "lucide-react";
+import Link from "next/link";
 
-export const getDeviceAssignedColumns = ({
+export const getAssignedAssetColumns = ({
   devices,
   employees,
   canEdit,
   canDelete,
   onDelete,
+  onReturn,
 }: any): ColumnDef<any>[] => [
   {
     accessorKey: "deviceId",
-    header: "Device",
+    header: "Asset",
     cell: ({ row }) =>
       devices.find((d: any) => d.id === row.original.deviceId)?.name,
   },
@@ -25,39 +26,39 @@ export const getDeviceAssignedColumns = ({
   {
     accessorKey: "assignedDate",
     header: "Assigned Date",
-    cell: ({ row }) =>
-      row.original.assignedDate
-        ? new Date(row.original.assignedDate).toLocaleString()
-        : "-",
   },
   {
     accessorKey: "status",
     header: "Status",
   },
   {
-    accessorKey: "createdAt",
-    header: "Created At",
-    cell: ({ row }) =>
-      row.original.createdAt
-        ? new Date(row.original.createdAt).toLocaleString()
-        : "-",
-  },
-  {
     id: "actions",
     header: "Action",
     cell: ({ row }) => (
       <div className="flex gap-2">
-        {/* VIEW */}
+        {/* INFO */}
         <Button asChild variant="outline">
-          <Link href={`/admin/device/${row.original.deviceId}/history?assignedId=${row.original.id}`}>
+          <Link
+            href={`/admin/device/${row.original.deviceId}/history?assignedId=${row.original.id}`}
+          >
             <Info />
           </Link>
         </Button>
 
+        {/* 🔥 RETURN BUTTON */}
+        {row.original.status === "ASSIGNED" && (
+          <Button
+            className="bg-green-500 hover:bg-green-600"
+            onClick={() => onReturn(row.original)}
+          >
+            <RotateCcw className="w-4 h-4" />
+          </Button>
+        )}
+
         {/* EDIT */}
         {canEdit && (
-          <Button asChild className="bg-orange-500 hover:bg-orange-600">
-            <Link href={`/admin/device-assigned/edit/${row.original.id}`}>
+          <Button asChild className="bg-orange-500">
+            <Link href={`/admin/assigned-asset/edit/${row.original.id}`}>
               <EditIcon />
             </Link>
           </Button>
@@ -75,4 +76,4 @@ export const getDeviceAssignedColumns = ({
       </div>
     ),
   },
-]
+];

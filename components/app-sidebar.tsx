@@ -69,8 +69,8 @@ const data = {
           icon: ComputerIcon,
         },
         {
-          title: "Device Assigned",
-          url: "/admin/device-assigned",
+          title: "Asset Assigned",
+          url: "/admin/assigned-asset",
           icon: UserPlus,
         },
       ],

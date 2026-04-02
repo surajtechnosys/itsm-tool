@@ -2,31 +2,31 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { returnDeviceAction } from "@/lib/actions/device-assigned-action";
+import { returnDeviceAction } from "@/lib/actions/asset-assigned-action";
 
-export default function DeviceReturnForm({ assignedId, deviceId, onClose }: any) {
-
+export default function DeviceReturnForm({
+  assignedId,
+  deviceId,
+  onClose,
+}: any) {
   const [damage, setDamage] = useState("NO");
   const [remarks, setRemarks] = useState("");
 
   const handleSubmit = async () => {
-
     const res = await returnDeviceAction({
       assignedId,
       deviceId,
       damage,
-      remarks
+      remarks,
     });
 
     if (res.success) {
       window.location.reload();
     }
-
   };
 
   return (
     <div className="border p-4 rounded space-y-4">
-
       <h3 className="font-semibold">Return Device</h3>
 
       <div>
@@ -52,9 +52,10 @@ export default function DeviceReturnForm({ assignedId, deviceId, onClose }: any)
 
       <div className="flex gap-2">
         <Button onClick={handleSubmit}>Returned</Button>
-        <Button variant="secondary" onClick={onClose}>Cancel</Button>
+        <Button variant="secondary" onClick={onClose}>
+          Cancel
+        </Button>
       </div>
-
     </div>
   );
 }

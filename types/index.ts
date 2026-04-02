@@ -6,7 +6,7 @@ import {
     moduleSchema,
     roleSchema,
     userSchema,
-    deviceAssignedSchema,
+    assignedAssetSchema,
     vendorSchema,
     requriementsSchema,
     configurationSchema,
@@ -32,7 +32,7 @@ export type Device = z.infer<typeof assetSchema>
 export type Department = z.infer<typeof departmentSchema>
 export type Location = z.infer<typeof locationSchema>
 export type Employee = z.infer<typeof employeeSchema>
-export type DeviceAssigned = z.infer<typeof deviceAssignedSchema>
+export type AssignedAsset = z.infer<typeof assignedAssetSchema>
 export type Vendor = z.infer<typeof vendorSchema>
 export type Requirement = z.infer<typeof requriementsSchema>
 export type Configuration = z.infer<typeof configurationSchema>

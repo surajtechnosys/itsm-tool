@@ -41,7 +41,7 @@ export default async function RootLayout({
           "/admin/asset",
           "/admin/asset-type",
           "/admin/accessory-type",
-          "/admin/device-assigned",
+          "/admin/assigned-asset",
           "/admin/vendor",
           "/admin/requirements",
           "/admin/procurement",

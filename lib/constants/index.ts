@@ -1,4 +1,4 @@
-import { AssignedDeviceStatus, Status, VendorStatus } from "@prisma/client";
+import { AssignmentStatus ,Status, VendorStatus } from "@prisma/client";
 
 export const APP_NAME =
   process.env.NEXT_APP_APP_NAME ?? "Asset Management System";
@@ -102,13 +102,14 @@ export const locationDefaultValues = {
   status: "ACTIVE",
 };
 
-export const assignedDeviceDefaultValues = {
-  deviceId: "",
+
+export const assignedAssetDefaultValues = {
+  assetId: "",
   employeeId: "",
   remarks: "",
-  status: AssignedDeviceStatus.NOTASSIGNED,
+  status: "ASSIGNED", // default when creating
   assignedDate: new Date(),
-  returnedDate: new Date(),
+  returnedDate: null, // ✅ important fix
 };
 
 export const vendorDefaultValues = {

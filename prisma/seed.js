@@ -10,6 +10,7 @@ async function main() {
     { name: "Asset", route: "/admin/asset" },
     { name: "Asset Type", route: "/admin/asset-type" }, // ✅ NEW MODULE
     { name: "Accessory Type", route: "/admin/accessory-type" },
+    { name: "Assigned Asset", route: "/admin/assigned-asset" },
     { name: "Vendor", route: "/admin/vendor" },
     { name: "Requirements", route: "/admin/requirements" },
     { name: "Procurement", route: "/admin/procurement" },
