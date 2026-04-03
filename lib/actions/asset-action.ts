@@ -23,7 +23,6 @@ export async function getAsset(): Promise<AssetType[]> {
 
 // ✅ CREATE ASSET
 export async function createAsset(data: AssetType) {
-  
   const session = await auth();
 
   if (!session?.user?.email) throw new Error("Unauthorized");
@@ -40,7 +39,8 @@ export async function createAsset(data: AssetType) {
     await prisma.asset.create({
       data: {
         name: assetData.name,
-        assetTypeId: assetData.assetTypeId, 
+        assetState: "AVAILABLE",
+        assetTypeId: assetData.assetTypeId,
         serialNumber: assetData.serialNumber,
         brand: assetData.brand,
         model: assetData.model,
@@ -93,6 +93,15 @@ export async function getAssetById(
       where: { id },
       include: {
         accessories: true,
+
+        assignedAssets: {
+          include: {
+            employee: true,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
       },
     });
 

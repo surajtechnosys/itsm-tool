@@ -76,6 +76,23 @@ const data = {
       ],
     },
     {
+      title: "Clients",
+      url: "/admin/front-client",
+      icon: PersonStanding,
+      items: [
+        {
+          title: "Front Client",
+          url: "/admin/front-client",
+          icon: PersonStandingIcon,
+        },
+        {
+          title: "End Client",
+          url: "/admin/end-client",
+          icon: PersonStandingIcon,
+        }
+      ],
+    },
+    {
       title: "Procurement",
       url: "/admin/procurement",
       icon: BriefcaseBusinessIcon,

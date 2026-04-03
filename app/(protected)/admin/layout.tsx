@@ -44,6 +44,8 @@ export default async function RootLayout({
           "/admin/assigned-asset",
           "/admin/vendor",
           "/admin/requirements",
+          "/admin/front-client",
+          "/admin/end-client",
           "/admin/procurement",
           "/admin/purchase-order",
           "/admin/employee",

@@ -151,9 +151,10 @@ model RoleModule {
 }
 
 model Asset {
-  id String @id @default(uuid()) @db.Uuid
+  id           String  @id @default(uuid()) @db.Uuid
   name         String
   serialNumber String?
+  assetState   String  @default("AVAILABLE")
 
   brand         String?
   model         String?
@@ -174,9 +175,9 @@ model Asset {
   warrantyProvider  String?
   warrantyType      String?
 
-  accessories   Accessory[]
+  accessories    Accessory[]
   assignedAssets AssignedAsset[]
-  notifications Notification[]
+  notifications  Notification[]
 
   assetTypeId String?
   assetType   AssetType? @relation(fields: [assetTypeId], references: [id])
@@ -223,20 +224,23 @@ model AssetType {
 }
 
 model AssignedAsset {
-  id          String   @id @default(uuid()) @db.Uuid
+  id String @id @default(uuid()) @db.Uuid
 
-  assetId     String   @db.Uuid   
-  employeeId  String   @db.Uuid
+  assetId    String @db.Uuid
+  employeeId String @db.Uuid
 
-  asset       Asset    @relation(fields: [assetId], references: [id])
-  employee    Employee @relation(fields: [employeeId], references: [id])
+  asset    Asset    @relation(fields: [assetId], references: [id])
+  employee Employee @relation(fields: [employeeId], references: [id])
 
-  status      AssignmentStatus @default(ASSIGNED)
-  assignedAt  DateTime @default(now())
-  returnedAt  DateTime?
+  status AssignmentStatus @default(ASSIGNED)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  assignedAt DateTime  @default(now())
+  returnedAt DateTime?
+
+  remarks String? // ✅ ADD THIS
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Department {
@@ -277,6 +281,47 @@ model Location {
   @@index([code])
 }
 
+model FrontClient {
+  id            String @id @default(cuid())
+  name          String
+  frontClientId String @unique
+  contactPerson String
+  contactNumber String
+  contactEmail  String
+  gstNumber     String
+  panNumber     String
+  address       String
+  country       String
+  pincode       String
+  city          String
+  state         String
+  status        String @default("Active")
+
+  endClients EndClient[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EndClient {
+  id          String @id @default(cuid())
+  name        String
+  endClientId String @unique
+
+  frontClientId  String  
+
+  frontClient    FrontClient @relation(fields: [frontClientId],references: [id], onDelete: Cascade)
+
+  contactPerson String
+  contactNumber String
+  contactEmail  String
+
+  status String @default("Active")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Notification {
   id      String           @id @default(uuid())
   title   String
@@ -293,7 +338,7 @@ model Notification {
 }
 
 model Employee {
-  id String @id @default(uuid()) @db.Uuid
+  id          String    @id @default(uuid()) @db.Uuid
   first_name  String
   last_name   String    @unique
   email       String?

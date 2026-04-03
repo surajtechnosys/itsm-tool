@@ -43,7 +43,37 @@ export type AccessoryType = {
   description?: string;
   status: "ACTIVE" | "INACTIVE";
 };
+export type FrontClient = {
+  name: string;
+  frontClientId: string;
+  contactPerson: string;
+  contactNumber: string;
+  contactEmail: string;
+  gstNumber: string;
+  panNumber: string;
+  address: string;
+  country: string;
+  pincode: string;
+  city: string;
+  state: string;
+  status: string;
+};
+export type EndClient = {
+  id: string;
 
+  name: string;
+  endClientId: string;
+  frontClientId: string;
+
+  contactPerson: string;
+  contactNumber: string;
+  contactEmail: string;
+
+  status: "Active" | "Inactive";
+
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 
 

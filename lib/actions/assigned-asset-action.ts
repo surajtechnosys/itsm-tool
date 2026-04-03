@@ -25,21 +25,35 @@ async function checkPermission(action: "view" | "create" | "edit" | "delete") {
   return user;
 }
 
-// ✅ GET ASSIGNED ASSETS
-export async function getAssignedAssets() {
+export async function getAssignedAssetById(id: string) {
   await checkPermission("view");
 
-  return await prisma.AssignedAsset.findMany({
-    where: {
-      status: "ASSIGNED",
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  try {
+    const data = await prisma.assignedAsset.findUnique({
+      where: { id },
+      include: {
+        asset: {
+          include: {
+            assetType: true,
+          },
+        },
+        employee: true,
+      },
+    });
+
+    if (!data) {
+      return { success: false, message: "Not found" };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    return {
+      success: false,
+      message: "Error fetching assigned asset",
+    };
+  }
 }
 
-// ✅ CREATE ASSIGNED ASSET
 export async function createAssignedAsset(data: AssignedAsset) {
   try {
     await checkPermission("create");
@@ -67,9 +81,8 @@ export async function createAssignedAsset(data: AssignedAsset) {
         data: {
           assetId: assignedAsset.assetId,
           employeeId: assignedAsset.employeeId,
-          remarks: assignedAsset.remarks,
           status: "ASSIGNED",
-          assignedDate: assignedAsset.assignedDate,
+          assignedAt: new Date(),
         },
       });
 
@@ -93,36 +106,7 @@ export async function createAssignedAsset(data: AssignedAsset) {
   }
 }
 
-// ✅ GET BY ID
-export async function getAssignedAssetById(id: string) {
-  try {
-    await checkPermission("edit");
-
-    const assignedAsset = await prisma.assignedAsset.findUnique({
-      where: { id },
-    });
-
-    if (!assignedAsset) {
-      return {
-        success: false,
-        message: "Assigned Asset not found",
-      };
-    }
-
-    return {
-      success: true,
-      data: assignedAsset,
-      message: "Assigned Asset fetched successfully",
-    };
-  } catch (error) {
-    return {
-      success: false,
-      message: formatError(error),
-    };
-  }
-}
-
-// ✅ UPDATE
+// UPDATE
 export async function updateAssignedAsset(data: AssignedAsset, id: string) {
   try {
     await checkPermission("edit");
@@ -134,10 +118,7 @@ export async function updateAssignedAsset(data: AssignedAsset, id: string) {
       data: {
         assetId: assignedAsset.assetId,
         employeeId: assignedAsset.employeeId,
-        remarks: assignedAsset.remarks,
         status: assignedAsset.status,
-        assignedDate: assignedAsset.assignedDate,
-        returnedDate: assignedAsset.returnedDate,
       },
     });
 
@@ -221,8 +202,7 @@ export async function returnAssetAction({
       where: { id: assignedId },
       data: {
         status: "RETURNED",
-        returnedDate: new Date(),
-        damage: damage || "NO",
+        returnedAt: new Date(),
         remarks: remarks || null,
       },
     });
@@ -236,4 +216,29 @@ export async function returnAssetAction({
   });
 
   return { success: true };
+}
+
+export async function getAssignedAssets() {
+  await checkPermission("view");
+
+  try {
+    const data = await prisma.assignedAsset.findMany({
+      include: {
+        asset: {
+          include: {
+            assetType: true,
+          },
+        },
+        employee: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return data;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
 }

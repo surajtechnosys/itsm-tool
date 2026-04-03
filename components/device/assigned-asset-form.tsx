@@ -54,8 +54,8 @@ const AssignedAssetForm = ({
   const id = data?.id;
 
   const form = useForm<z.infer<typeof assignedAssetSchema>>({
-    resolver: zodResolver(assignedAssetSchema),
-    defaultValues: data || assignedAssetDefaultValues,
+    resolver: zodResolver(assignedAssetSchema) as any,
+    defaultValues: data || {},
   });
 
   const [isPending, startTransition] = React.useTransition();

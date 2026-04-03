@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { AssignedDeviceStatus, Status, VendorStatus } from "@prisma/client";
+import {  Status, VendorStatus } from "@prisma/client";
+import { AssignmentStatus } from "@prisma/client";
 
 export const statusEnum = z.enum(["ACTIVE", "INACTIVE"]);
 
@@ -235,6 +236,36 @@ export const vendorSchema = z.object({
   notes: z.string().min(1, "note is required"),
   createdAt: z.date().nullable().optional(),
   updatedAt: z.date().nullable().optional(),
+});
+
+// Front client schema
+export const frontClientSchema = z.object({
+  name: z.string().min(1),
+  frontClientId: z.string().min(1),
+  contactPerson: z.string().min(1),
+  contactNumber: z.string().min(10),
+  contactEmail: z.string().email(),
+  gstNumber: z.string().min(1),
+  panNumber: z.string().min(1),
+  address: z.string().min(1),
+  country: z.string().min(1),
+  pincode: z.string().min(1),
+  city: z.string().min(1),
+  state: z.string().min(1),
+  status: z.string(),
+});
+
+//end client schema
+export const endClientSchema = z.object({
+  name: z.string().min(1),
+  endClientId: z.string().min(1),
+  frontClientId: z.string().min(1),
+
+  contactPerson: z.string().min(1),
+  contactNumber: z.string().min(10),
+  contactEmail: z.string().email(),
+
+  status: z.string(),
 });
 
 // requriements

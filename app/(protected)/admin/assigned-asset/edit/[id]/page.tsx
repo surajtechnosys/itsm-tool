@@ -2,7 +2,7 @@ import AssignedAssetForm from "@/components/device/assigned-asset-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-// import { getAssets } from "@/lib/actions/asset-action";
+import { getAssignedAssetById } from "@/lib/actions/assigned-asset-action";
 import { getAsset } from "@/lib/actions/asset-action";
 import { getEmployee } from "@/lib/actions/employee";
 
@@ -30,6 +30,11 @@ const AssignedAssetCreatePage = async () => {
 
   const assets = await getAsset();
   const employees = await getEmployee();
+  const res = await getAssignedAssetById(id);
+
+  if (!res.success) {
+    redirect("/404");
+  }
 
   return (
     <Card>
@@ -45,9 +50,10 @@ const AssignedAssetCreatePage = async () => {
 
       <CardContent>
         <AssignedAssetForm
-          update={false}
-          assets={assets as AssetType[]}
-          employees={employees as Employee[]}
+          data={res.data}
+          update={true}
+          assets={assets}
+          employees={employees}
         />
       </CardContent>
     </Card>

@@ -9,10 +9,8 @@ import { getAssignedAssetColumns } from "./assigned-asset-columns";
 import {
   deleteAssignedAsset,
   getAssignedAssets,
-  updateAssignedAsset,
+  returnAssetAction, // ✅ USE THIS
 } from "@/lib/actions/assigned-asset-action";
-
-import AssignedAssetForm from "@/components/device/assigned-asset-form";
 
 import {
   Dialog,
@@ -23,8 +21,6 @@ import {
 
 export default function AssignedAssetTable({
   data,
-  devices,
-  employees,
   canEdit,
   canDelete,
   title,
@@ -33,7 +29,9 @@ export default function AssignedAssetTable({
   const [tableData, setTableData] = useState(data);
   const [openReturn, setOpenReturn] = useState(false);
   const [selectedRow, setSelectedRow] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
+  // ✅ DELETE
   const deleteHandler = async (id: string) => {
     const res = await deleteAssignedAsset(id);
 
@@ -47,14 +45,42 @@ export default function AssignedAssetTable({
     }
   };
 
+  // ✅ OPEN RETURN MODAL
   const handleReturn = (row: any) => {
     setSelectedRow(row);
     setOpenReturn(true);
   };
 
+  // ✅ CONFIRM RETURN (🔥 FIXED)
+  const confirmReturn = async () => {
+    if (!selectedRow) return;
+
+    setLoading(true);
+
+    try {
+      const res = await returnAssetAction({
+        assignedId: selectedRow.id,
+        assetId: selectedRow.assetId,
+      });
+
+      if (!res?.success) {
+        toast.error("Error", { description: "Return failed" });
+      } else {
+        toast.success("Asset returned successfully");
+
+        const updated = await getAssignedAssets();
+        setTableData(updated);
+        setOpenReturn(false);
+      }
+    } catch (err) {
+      toast.error("Error", { description: "Something went wrong" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ CLEAN columns (no assets/employees needed anymore)
   const columns = getAssignedAssetColumns({
-    devices,
-    employees,
     canEdit,
     canDelete,
     onDelete: deleteHandler,
@@ -70,7 +96,7 @@ export default function AssignedAssetTable({
         actions={actions}
       />
 
-      {/* 🔥 RETURN MODAL */}
+      {/* ✅ RETURN MODAL (FIXED UI) */}
       <Dialog open={openReturn} onOpenChange={setOpenReturn}>
         <DialogContent>
           <DialogHeader>
@@ -78,18 +104,19 @@ export default function AssignedAssetTable({
           </DialogHeader>
 
           {selectedRow && (
-            <AssignedAssetForm
-              data={selectedRow}
-              update={true}
-              assets={assets}
-              employees={employees}
-              isReturn={true}
-              onSuccess={async () => {
-                setOpenReturn(false);
-                const updated = await getAssignedAssets();
-                setTableData(updated);
-              }}
-            />
+            <div className="flex flex-col gap-4">
+              <p>
+                Are you sure you want to return this asset?
+              </p>
+
+              <button
+                onClick={confirmReturn}
+                disabled={loading}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+              >
+                {loading ? "Returning..." : "Confirm Return"}
+              </button>
+            </div>
           )}
         </DialogContent>
       </Dialog>

@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { getFrontClientById } from "@/lib/actions/front-client";
 import { FrontClient } from "@/types";
 import Link from "next/link";
-import React from "react";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions, canAccess } from "@/lib/rbac";
@@ -35,24 +34,28 @@ const FrontClientEditPage = async ({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <h1>Edit Front Client</h1>
+    <div className="p-4">
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <h1 className="text-lg font-semibold">
+              Edit Front Client
+            </h1>
 
-          <Button className="bg-blue-500 hover:bg-blue-600">
-            <Link href="/admin/front-client">Back</Link>
-          </Button>
-        </div>
-      </CardHeader>
+            <Button asChild className="bg-blue-500 hover:bg-blue-600">
+              <Link href="/admin/front-client">Back</Link>
+            </Button>
+          </div>
+        </CardHeader>
 
-      <CardContent>
-        <FrontClientForm
-          data={res.data as FrontClient}
-          update={true}
-        />
-      </CardContent>
-    </Card>
+        <CardContent>
+          <FrontClientForm
+            data={res.data as FrontClient}
+            update={true}
+          />
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

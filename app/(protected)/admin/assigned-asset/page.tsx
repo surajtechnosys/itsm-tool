@@ -4,12 +4,9 @@ import Link from "next/link";
 import React from "react";
 
 import AssignedAssetTable from "./assigned-asset-table";
-
-// import { getAssignedDevices } from "@/lib/actions/asset-assigned-action";
-import { getAssignedAssetById } from "@/lib/actions/assigned-asset-action";
 import { getEmployee } from "@/lib/actions/employee";
-// import { getDevice } from "@/lib/actions/device";/
-import { getAssetById } from "@/lib/actions/asset-action";
+import { getAsset } from "@/lib/actions/asset-action";
+import { getAssignedAssets } from "@/lib/actions/assigned-asset-action";
 
 import { Device, Employee } from "@/types";
 import { auth } from "@/auth";
@@ -37,7 +34,7 @@ const AssignedAssetPage = async () => {
 
   const [assignedAssets, devices, employees] = await Promise.all([
     getAssignedAssets(),
-    getAssets(),
+    getAsset(),
     getEmployee(),
   ]);
 
@@ -46,7 +43,6 @@ const AssignedAssetPage = async () => {
       <CardContent className="w-full">
         <AssignedAssetTable
           data={assignedAssets}
-          devices={devices as Device[]}
           employees={employees as Employee[]}
           canEdit={canEdit}
           canDelete={canDelete}
