@@ -14,6 +14,7 @@ async function main() {
     { name: "End Client", route: "/admin/end-client" },
     { name: "Front Client", route: "/admin/front-client" },
     { name: "Purchase Order", route: "/admin/purchase-order" },
+    { name: "PO Asset", route: "/admin/po-asset" },
     { name: "Employee", route: "/admin/employee" },
     { name: "Department", route: "/admin/department" },
     { name: "Location", route: "/admin/location" },
@@ -44,7 +45,6 @@ async function main() {
 
   console.log("Modules seeded");
 
-  // ✅ ADMIN ROLE
   const adminRole = await prisma.role.upsert({
     where: { name: "Admin" },
     update: {},
@@ -56,7 +56,6 @@ async function main() {
 
   console.log("Admin role created");
 
-  // ✅ ASSIGN ALL PERMISSIONS
   for (const module of createdModules) {
     await prisma.roleModule.upsert({
       where: {
@@ -79,7 +78,6 @@ async function main() {
 
   console.log("Admin permissions assigned");
 
-  // ✅ ADMIN USER
   const hashedPassword = await bcrypt.hash("123456", 10);
 
   const adminUser = await prisma.user.upsert({

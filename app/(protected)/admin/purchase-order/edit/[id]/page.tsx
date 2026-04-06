@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import { getPurchaseOrderById } from "@/lib/actions/purchase-order";
 import { getEndClients } from "@/lib/actions/end-client";
-import { getEmployees } from "@/lib/actions/employee";
+import { getEmployee } from "@/lib/actions/employee";
 
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -35,7 +35,7 @@ const PurchaseOrderEditPage = async ({
   // 📦 Fetch data
   const res = await getPurchaseOrderById(id);
   const endClients = await getEndClients();
-  const employees = await getEmployees();
+  const employees = await getEmployee();
 
   if (!res?.success || !res.data) {
     redirect("/404");

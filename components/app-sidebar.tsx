@@ -98,6 +98,18 @@ const data = {
       ],
     },
     {
+      title: "CMDB",
+      url: "/admin/po-asset",
+      icon: BriefcaseBusinessIcon,
+      items: [
+        {
+          title: "PO Asset",
+          url: "/admin/po-asset",
+          icon: BriefcaseBusinessIcon,
+        },
+      ], 
+    },
+    {
       title: "Employee",
       url: "/admin/employee",
       icon: PersonStanding,

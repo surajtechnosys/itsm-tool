@@ -265,6 +265,26 @@ export const purchaseOrderSchema = z.object({
   poValue: z.string(),
 });
 
+// ✅ SCHEMA
+export const poAssetSchema = z.object({
+  endClientId: z.string().min(1),
+  purchaseOrderId: z.string().min(1),
+
+  make: z.string().min(1),
+  model: z.string().min(1),
+  serialNumber: z.string().min(1),
+
+  startDate: z.string().min(1),
+  endDate: z.string().min(1),
+
+  sla: z.string().optional(),
+
+  pincode: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  address: z.string().optional(),
+});
+
 // configuration
 export const configurationSchema = z.object({
   id: z.string().optional(),

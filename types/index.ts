@@ -8,7 +8,8 @@ import {
     userSchema,
     assignedAssetSchema,
     configurationSchema,
-    assetTypeSchema
+    assetTypeSchema,
+    poAssetSchema
 } from "@/lib/validators";
 
 import z from "zod";
@@ -31,6 +32,7 @@ export type Location = z.infer<typeof locationSchema>
 export type Employee = z.infer<typeof employeeSchema>
 export type AssignedAsset = z.infer<typeof assignedAssetSchema>
 export type Configuration = z.infer<typeof configurationSchema>
+export type POAsset = z.infer<typeof poAssetSchema>
 export type AccessoryType = {
   id?: string;
   name: string;

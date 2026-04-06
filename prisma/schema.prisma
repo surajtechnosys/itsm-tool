@@ -309,6 +309,7 @@ model EndClient {
   status String @default("Active")
 
   purchaseOrders PurchaseOrder[]
+  poAssets       POAsset[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -395,9 +396,36 @@ model PurchaseOrder {
   poValue       Float
 
   createdAt     DateTime @default(now())
+  poAssets POAsset[] 
 
   endClient EndClient @relation(fields: [endClientId], references: [id])
   employee  Employee  @relation(fields: [employeeId], references: [id])
+}
+
+model POAsset {
+  id              String   @id @default(cuid())
+
+  endClientId     String
+  purchaseOrderId String
+
+  make            String
+  model           String
+  serialNumber    String
+
+  startDate       DateTime
+  endDate         DateTime
+
+  sla             String?
+
+  pincode         String?
+  city            String?
+  state           String?
+  address         String?
+
+  createdAt       DateTime @default(now())
+
+  endClient       EndClient      @relation(fields: [endClientId], references: [id])
+  purchaseOrder   PurchaseOrder  @relation(fields: [purchaseOrderId], references: [id])
 }
 
 
