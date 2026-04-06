@@ -89,34 +89,12 @@ const data = {
           title: "End Client",
           url: "/admin/end-client",
           icon: PersonStandingIcon,
-        }
-      ],
-    },
-    {
-      title: "Procurement",
-      url: "/admin/procurement",
-      icon: BriefcaseBusinessIcon,
-      items: [
-        {
-          title: "Vendor",
-          url: "/admin/vendor",
-          icon: BriefcaseBusinessIcon,
-        },
-        {
-          title: "Requirements",
-          url: "/admin/requirements",
-          icon: BriefcaseBusinessIcon,
-        },
-        {
-          title: "Procurement",
-          url: "/admin/procurement",
-          icon: BriefcaseBusinessIcon,
         },
         {
           title: "Purchase Order",
           url: "/admin/purchase-order",
           icon: FileText,
-        },
+        }
       ],
     },
     {

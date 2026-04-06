@@ -8,14 +8,11 @@ async function main() {
 
   const modules = [
     { name: "Asset", route: "/admin/asset" },
-    { name: "Asset Type", route: "/admin/asset-type" }, // ✅ NEW MODULE
+    { name: "Asset Type", route: "/admin/asset-type" },
     { name: "Accessory Type", route: "/admin/accessory-type" },
     { name: "Assigned Asset", route: "/admin/assigned-asset" },
-    { name: "Vendor", route: "/admin/vendor" },
-    { name: "Requirements", route: "/admin/requirements" },
     { name: "End Client", route: "/admin/end-client" },
     { name: "Front Client", route: "/admin/front-client" },
-    { name: "Procurement", route: "/admin/procurement" },
     { name: "Purchase Order", route: "/admin/purchase-order" },
     { name: "Employee", route: "/admin/employee" },
     { name: "Department", route: "/admin/department" },

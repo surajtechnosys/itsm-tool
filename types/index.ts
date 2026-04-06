@@ -7,10 +7,7 @@ import {
     roleSchema,
     userSchema,
     assignedAssetSchema,
-    vendorSchema,
-    requriementsSchema,
     configurationSchema,
-    procurementSchema,
     assetTypeSchema
 } from "@/lib/validators";
 
@@ -33,10 +30,7 @@ export type Department = z.infer<typeof departmentSchema>
 export type Location = z.infer<typeof locationSchema>
 export type Employee = z.infer<typeof employeeSchema>
 export type AssignedAsset = z.infer<typeof assignedAssetSchema>
-export type Vendor = z.infer<typeof vendorSchema>
-export type Requirement = z.infer<typeof requriementsSchema>
 export type Configuration = z.infer<typeof configurationSchema>
-export type Procurement = z.infer<typeof procurementSchema>
 export type AccessoryType = {
   id?: string;
   name: string;
@@ -73,6 +67,31 @@ export type EndClient = {
 
   createdAt: Date;
   updatedAt: Date;
+};
+
+export type PurchaseOrder = {
+  id: string;
+
+  endClientId: string;
+  employeeId: string;
+
+  poNumber: string;
+
+  contactName?: string;
+  contactNumber?: string;
+  contactEmail?: string;
+
+  startDate: Date;
+  endDate: Date;
+  poReceiveDate: Date;
+
+  poType: string;
+
+  status: "Active" | "Inactive";
+
+  poValue: number;
+
+  createdAt: Date;
 };
 
 

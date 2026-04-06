@@ -1,4 +1,4 @@
-import { AssignmentStatus ,Status, VendorStatus } from "@prisma/client";
+import { AssignmentStatus ,Status } from "@prisma/client";
 
 export const APP_NAME =
   process.env.NEXT_APP_APP_NAME ?? "Asset Management System";
@@ -112,38 +112,21 @@ export const assignedAssetDefaultValues = {
   returnedDate: null, // ✅ important fix
 };
 
-export const vendorDefaultValues = {
-  vendorCode: "",
-  name: " ",
-  contactPerson: "",
-  phone: "",
-  email: "",
-  addressLine1: "",
-  addressLine2: "",
-  city: "",
-  state: "",
-  postalCode: "",
-  country: "",
-  taxId: "",
-  website: "",
-  status: VendorStatus.ACTIVE,
-  notes: "",
-};
+const purchaseOrderDefaultValues = {
+  endClientId: "",
+  poNumber: "",
 
-export const requirementDefaultValues = {
-  manufatured: "",
-  model: "",
-  vendorIds: [],
-  configuration: [
-    {
-      item: "",
-      quantity: "",
-      description: "",
-    },
-  ],
-  warranty: "",
-  warrantyType: "",
-  quotationValidity: "",
-  status: Status.ACTIVE,
-  notes: "",
+  contactName: "",
+  contactNumber: "",
+  contactEmail: "",
+
+  startDate: "",
+  endDate: "",
+  poReceiveDate: "",
+
+  employeeId: "",
+  poType: "",
+
+  status: "Active",   // ✅ important default
+  poValue: "",
 };

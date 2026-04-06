@@ -1,149 +1,180 @@
 "use server";
 
-import { prisma } from "@/lib/db/prisma-helper";
-import { createPurchaseOrderSchema } from "@/lib/validators";
-import { PurchaseOrderStatus } from "@/lib/generated/prisma/enums";
-import { revalidatePath } from "next/cache";
+import { prisma } from "../db/prisma-helper";
 import { auth } from "@/auth";
 import { getUserPermissions, canAccess } from "@/lib/rbac";
+import { formatError } from "../utils";
 
-/* ---------------- RBAC CHECK ---------------- */
+import { PurchaseOrder } from "@/types";
+import { purchaseOrderSchema } from "../validators";
 
-async function checkPermission(action: "view" | "create" | "edit") {
+
+export async function getPurchaseOrders(): Promise<PurchaseOrder[]> {
+  const data = await prisma.purchaseOrder.findMany({
+    include: {
+      endClient: true,
+      employee: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return data as unknown as PurchaseOrder[];
+}
+
+
+export async function createPurchaseOrder(data: PurchaseOrder) {
   const session = await auth();
 
-  if (!session?.user?.email) {
-    throw new Error("Unauthorized");
-  }
+  if (!session?.user?.email) throw new Error("Unauthorized");
 
   const user = await getUserPermissions(session.user.email);
-  const route = "/admin/purchase-order";
 
-  const roleName = user?.role?.name || "";
-  const isAdmin = roleName.toLowerCase().includes("admin");
-
-  if (!isAdmin && !canAccess(user, route, action)) {
-    throw new Error("Access Denied");
+  if (!canAccess(user, "/admin/purchase-order", "create")) {
+    throw new Error("No permission");
   }
-}
 
-/* ---------------- CREATE ---------------- */
+  try {
+    const po = purchaseOrderSchema.parse(data);
 
-export async function createPurchaseOrder(input: unknown) {
-  await checkPermission("create");
+    await prisma.purchaseOrder.create({
+      data: {
+        endClientId: po.endClientId,
+        poNumber: po.poNumber,
 
-  const data = createPurchaseOrderSchema.parse(input);
+        contactName: po.contactName,
+        contactNumber: po.contactNumber,
+        contactEmail: po.contactEmail,
 
-  const totalAmount = data.items.reduce(
-    (sum, item) =>
-      sum + Number(item.quantity) * Number(item.unitPrice),
-    0
-  );
+        startDate: new Date(po.startDate),
+        endDate: new Date(po.endDate),
+        poReceiveDate: new Date(po.poReceiveDate),
 
-  const purchaseOrder = await prisma.purchaseOrder.create({
-    data: {
-      poNumber: `PO-${Date.now()}`,
-      requirementId: data.requirementId,
-      vendorId: data.vendorId,
-      totalAmount,
-      status: PurchaseOrderStatus.DRAFT,
+        employeeId: po.employeeId,
+        poType: po.poType,
 
-      items: {
-        create: data.items.map((item) => ({
-          deviceCategoryId: item.deviceCategoryId,
-          quantity: Number(item.quantity),
-          unitPrice: Number(item.unitPrice),
-          totalPrice:
-            Number(item.quantity) * Number(item.unitPrice),
-        })),
+        status: po.status,
+        poValue: Number(po.poValue),
       },
-    },
-  });
+    });
 
-  revalidatePath("/admin/purchase-order");
-
-  return {
-    success: true,
-    data: purchaseOrder,
-    message: "Purchase Order created successfully",
-  };
+    return {
+      success: true,
+      message: "Purchase Order created successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
 }
 
-/* ---------------- UPDATE STATUS ---------------- */
 
-export async function updatePurchaseOrderStatus(id: string) {
-  await checkPermission("edit");
+export async function getPurchaseOrderById(
+  id: string,
+): Promise<{ success: boolean; data?: PurchaseOrder; message: string }> {
+  try {
+    const po = await prisma.purchaseOrder.findUnique({
+      where: { id },
+      include: {
+        endClient: true,
+        employee: true,
+      },
+    });
 
-  const po = await prisma.purchaseOrder.findUnique({
-    where: { id },
-  });
+    if (!po) {
+      return { success: false, message: "Purchase Order not found" };
+    }
 
-  if (!po) {
-    throw new Error("Purchase Order not found");
+    return {
+      success: true,
+      data: po as unknown as PurchaseOrder,
+      message: "Purchase Order fetched successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
+}
+
+
+export async function updatePurchaseOrder(data: PurchaseOrder, id: string) {
+  const session = await auth();
+
+  if (!session?.user?.email) throw new Error("Unauthorized");
+
+  const user = await getUserPermissions(session.user.email);
+
+  if (!canAccess(user, "/admin/purchase-order", "edit")) {
+    throw new Error("No permission");
   }
 
-  if (po.status === PurchaseOrderStatus.DRAFT) {
+  try {
+    const po = purchaseOrderSchema.parse(data);
+
     await prisma.purchaseOrder.update({
       where: { id },
-      data: { status: PurchaseOrderStatus.SENT },
+      data: {
+        endClientId: po.endClientId,
+        poNumber: po.poNumber,
+
+        contactName: po.contactName,
+        contactNumber: po.contactNumber,
+        contactEmail: po.contactEmail,
+
+        startDate: new Date(po.startDate),
+        endDate: new Date(po.endDate),
+        poReceiveDate: new Date(po.poReceiveDate),
+
+        employeeId: po.employeeId,
+        poType: po.poType,
+
+        status: po.status,
+        poValue: Number(po.poValue),
+      },
     });
-  } else if (po.status === PurchaseOrderStatus.SENT) {
-    await prisma.purchaseOrder.update({
+
+    return {
+      success: true,
+      message: "Purchase Order updated successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
+}
+
+
+export async function deletePurchaseOrder(id: string) {
+  const session = await auth();
+
+  if (!session?.user?.email) throw new Error("Unauthorized");
+
+  const user = await getUserPermissions(session.user.email);
+
+  if (!canAccess(user, "/admin/purchase-order", "delete")) {
+    throw new Error("No permission");
+  }
+
+  try {
+    await prisma.purchaseOrder.delete({
       where: { id },
-      data: { status: PurchaseOrderStatus.RECEIVED },
     });
-  } else {
-    throw new Error("Purchase Order cannot be modified further");
+
+    return {
+      success: true,
+      message: "Purchase Order deleted successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
   }
-
-  revalidatePath("/admin/purchase-order");
-
-  return {
-    success: true,
-    message: "Status updated",
-  };
-}
-
-/* ---------------- GET ALL ---------------- */
-
-export async function getPurchaseOrders() {
-  await checkPermission("view");
-
-  return prisma.purchaseOrder.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      vendor: true,
-      requirement: true,
-      items: {
-        include: {
-          deviceCategory: true,
-        },
-      },
-    },
-  });
-}
-
-/* ---------------- GET BY ID ---------------- */
-
-export async function getPurchaseOrderById(id: string) {
-  await checkPermission("view");
-
-  const po = await prisma.purchaseOrder.findUnique({
-    where: { id },
-    include: {
-      vendor: true,
-      requirement: true,
-      items: {
-        include: {
-          deviceCategory: true,
-        },
-      },
-    },
-  });
-
-  if (!po) {
-    throw new Error("Purchase Order not found");
-  }
-
-  return po;
 }

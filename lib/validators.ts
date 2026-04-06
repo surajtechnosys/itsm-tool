@@ -1,5 +1,5 @@
 import { z } from "zod";
-import {  Status, VendorStatus } from "@prisma/client";
+import {  Status } from "@prisma/client";
 import { AssignmentStatus } from "@prisma/client";
 
 export const statusEnum = z.enum(["ACTIVE", "INACTIVE"]);
@@ -216,28 +216,6 @@ export const assignedAssetSchema = z.object({
   updatedAt: z.date().nullable().optional(),
 });
 
-// vendor table schema
-export const vendorSchema = z.object({
-  id: z.string().optional(),
-  vendorCode: z.string().min(1, "vendor code is required"),
-  name: z.string().min(1, "vendor name is required"),
-  contactPerson: z.string().min(1, "contact person is required"),
-  phone: z.string().min(1, "phone is required"),
-  email: z.string().min(1, "email is required"),
-  addressLine1: z.string().min(1, "address line 1 is required"),
-  addressLine2: z.string().min(1, "address line 2 is required"),
-  city: z.string().min(1, "city is required"),
-  state: z.string().min(1, "state is required"),
-  postalCode: z.string().min(1, "postal code is required"),
-  country: z.string().min(1, "country is required"),
-  taxId: z.string().min(1, "taxID is required"),
-  website: z.string().min(1, "website is required"),
-  status: z.enum(Object.values(VendorStatus)),
-  notes: z.string().min(1, "note is required"),
-  createdAt: z.date().nullable().optional(),
-  updatedAt: z.date().nullable().optional(),
-});
-
 // Front client schema
 export const frontClientSchema = z.object({
   name: z.string().min(1),
@@ -268,56 +246,23 @@ export const endClientSchema = z.object({
   status: z.string(),
 });
 
-// requriements
-export const requriementsSchema = z.object({
-  id: z.string().optional(),
-  manufatured: z.string().min(1),
-  model: z.string().min(1),
+export const purchaseOrderSchema = z.object({
+  endClientId: z.string(),
+  poNumber: z.string(),
 
-  vendorIds: z.array(z.string()),
+  contactName: z.string().optional(),
+  contactNumber: z.string().optional(),
+  contactEmail: z.string().optional(),
 
-  configuration: z.array(
-    z.object({
-      item: z.string().min(1, "Item required"),
-      quantity: z.string().optional(),
-      description: z.string().optional(),
-    }),
-  ),
+  startDate: z.string(),
+  endDate: z.string(),
+  poReceiveDate: z.string(),
 
-  warranty: z.string(),
-  warrantyType: z.string().optional(),
+  employeeId: z.string(),
+  poType: z.string(),
 
-  quotationValidity: z.union([z.string(), z.date()]),
-
-  status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
-
-  notes: z.string().optional(),
-  createdAt: z.date().nullable().optional(),
-  updatedAt: z.date().nullable().optional(),
-});
-
-// procurement schema
-export const procurementSchema = z.object({
-  id: z.string().optional(),
-  manufatured: z.string().min(1),
-  model: z.string().min(1),
-  vendorId: z.string(),
-  requirementId: z.string(),
-  configuration: z.array(
-    z.object({
-      item: z.string().min(1, "Item required"),
-      quantity: z.string().optional(),
-      description: z.string().optional(),
-    }),
-  ),
-
-  warranty: z.string(),
-  warrantyType: z.string().optional(),
-  quotationValidity: z.union([z.string(), z.date()]),
-  status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
-  notes: z.string().optional(),
-  createdAt: z.date().nullable().optional(),
-  updatedAt: z.date().nullable().optional(),
+  status: z.string(),
+  poValue: z.string(),
 });
 
 // configuration
@@ -335,29 +280,3 @@ export const configurationSchema = z.object({
   fromEmail: z.string().email(),
 });
 
-export const purchaseOrderItemSchema = z.object({
-  deviceCategoryId: z.string().uuid(),
-  quantity: z.number().int().positive(),
-  unitPrice: z.number().nonnegative(),
-});
-
-export const createPurchaseOrderSchema = z.object({
-  requirementId: z.string().uuid(),
-  vendorId: z.string().uuid(),
-  items: z
-    .array(purchaseOrderItemSchema)
-    .min(1, "At least one item is required"),
-});
-
-export const vendorRequestSchema = z.object({
-  manufatured: z.string().min(2, "Manufacturer is required"),
-  model: z.string().min(1, "Model is required"),
-  configuration: z.string().optional(),
-  warranty: z.string().min(1, "Warranty is required"),
-  warrantyType: z.string().optional(),
-  quotationValidity: z.coerce.date(),
-  price: z.coerce.number().positive("Price must be greater than 0"),
-  remarks: z.string().optional(),
-});
-
-export type VendorRequestInput = z.infer<typeof vendorRequestSchema>;

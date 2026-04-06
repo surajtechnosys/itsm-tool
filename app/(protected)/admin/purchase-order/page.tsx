@@ -1,26 +1,17 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+// import PurchaseOrderTable from "./purchase-order-table";
+import PurchaseOrderTable from "./purchase-order-table";
+// import { getPurchaseOrders } from "@/lib/actions/purchase-order";
+import { getPurchaseOrders } from "@/lib/actions/purchase-order";
+import { PurchaseOrder } from "@/types";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserPermissions, canAccess } from "@/lib/rbac";
-import {
-  getPurchaseOrders,
-  updatePurchaseOrderStatus,
-} from "@/lib/actions/purchase-order";
-import PurchaseOrderTable from "./purchase-order-table";
 
-export default async function PurchaseOrderPage() {
+const PurchaseOrderPage = async () => {
   const session = await auth();
+
   if (!session?.user?.email) {
     redirect("/sign-in");
   }
@@ -32,28 +23,31 @@ export default async function PurchaseOrderPage() {
     redirect("/404");
   }
 
-  const roleName = user?.role?.name || "";
-  const isAdmin = roleName.toLowerCase().includes("admin");
-
-  const canCreate = isAdmin || canAccess(user, route, "create");
-  const canEdit = isAdmin || canAccess(user, route, "edit");
+  const canCreate = canAccess(user, route, "create");
+  const canEdit = canAccess(user, route, "edit");
+  const canDelete = canAccess(user, route, "delete");
 
   const purchaseOrders = await getPurchaseOrders();
 
   return (
     <div className="mt-2">
       <PurchaseOrderTable
-        data={purchaseOrders}
+        data={(purchaseOrders ?? []) as PurchaseOrder[]}
         canEdit={canEdit}
+        canDelete={canDelete}
         title="Purchase Orders"
         actions={
           canCreate && (
             <Button className="bg-blue-500 hover:bg-blue-600">
-              <Link href="/admin/purchase-order/create">Create PO</Link>
+              <Link href="/admin/purchase-order/create">
+                Add Purchase Order
+              </Link>
             </Button>
           )
         }
       />
     </div>
   );
-}
+};
+
+export default PurchaseOrderPage;

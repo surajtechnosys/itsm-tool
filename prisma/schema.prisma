@@ -24,17 +24,7 @@ enum DeviceStatus {
   RETIRED
 }
 
-enum VendorStatus {
-  ACTIVE
-  INACTIVE
-  BLACKLISTED
-}
 
-enum QuotationStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
 
 enum DeviceState {
   AVAILABLE
@@ -318,6 +308,8 @@ model EndClient {
 
   status String @default("Active")
 
+  purchaseOrders PurchaseOrder[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -358,6 +350,7 @@ model Employee {
   updatedAt DateTime @updatedAt
 
   assignedAssets AssignedAsset[]
+  purchaseOrders PurchaseOrder[]
 
   @@index([departmentId])
   @@index([status])
@@ -383,61 +376,30 @@ model Designation {
   @@index([code])
 }
 
-model Vendor {
-  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  vendorCode     String          @unique
-  purchaseOrders PurchaseOrder[]
-  quotations     Quotation[]
-  name           String
-  contactPerson  String?
-  phone          String?
-  email          String?
-  addressLine1   String?
-  addressLine2   String?
-  city           String?
-  state          String?
-  postalCode     String?
-  country        String?
-  taxId          String?
-  website        String?
-  status         VendorStatus    @default(ACTIVE)
-  notes          String?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+model PurchaseOrder {
+  id            String   @id @default(cuid())
+  endClientId   String
+  employeeId    String   @db.Uuid 
+
+  poNumber      String
+  contactName   String?
+  contactNumber String?
+  contactEmail  String?
+
+  startDate     DateTime
+  endDate       DateTime
+  poReceiveDate DateTime
+
+  poType        String
+  status        String
+  poValue       Float
+
+  createdAt     DateTime @default(now())
+
+  endClient EndClient @relation(fields: [endClientId], references: [id])
+  employee  Employee  @relation(fields: [employeeId], references: [id])
 }
 
-model Requirement {
-  id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  manufatured       String
-  purchaseOrders    PurchaseOrder[]
-  quotations        Quotation[]
-  model             String
-  configuration     Json?
-  warranty          String
-  notes             String?
-  vendorIds         String[]
-  warrantyType      String?
-  quotationValidity DateTime        @db.Timestamp(6)
-  createdAt         DateTime        @default(now()) @db.Timestamp(6)
-  updatedAt         DateTime        @updatedAt
-  status            Status          @default(ACTIVE)
-}
-
-model Procurement {
-  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  manufatured       String
-  model             String
-  configuration     Json?
-  warranty          String
-  notes             String?
-  vendorId          String
-  warrantyType      String?
-  quotationValidity DateTime @db.Timestamp(6)
-  createdAt         DateTime @default(now()) @db.Timestamp(6)
-  updatedAt         DateTime @updatedAt
-  status            Status   @default(ACTIVE)
-  requirementId     String
-}
 
 model Configuration {
   id      String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -452,72 +414,3 @@ model Configuration {
   fromEmail    String
 }
 
-enum PurchaseOrderStatus {
-  DRAFT
-  SENT
-  APPROVED
-  RECEIVED
-  CANCELLED
-}
-
-model PurchaseOrder {
-  id            String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  poNumber      String              @unique
-  requirementId String              @db.Uuid
-  vendorId      String              @db.Uuid
-  status        PurchaseOrderStatus @default(DRAFT)
-  totalAmount   Float
-
-  requirement Requirement         @relation(fields: [requirementId], references: [id], onDelete: Cascade)
-  vendor      Vendor              @relation(fields: [vendorId], references: [id], onDelete: Cascade)
-  items       PurchaseOrderItem[]
-
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  updatedAt DateTime @updatedAt @db.Timestamp(6)
-
-  @@index([requirementId])
-  @@index([vendorId])
-  @@index([status])
-}
-
-model PurchaseOrderItem {
-  id               String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  purchaseOrderId  String @db.Uuid
-  deviceCategoryId String @db.Uuid
-  quantity         Int
-  unitPrice        Float
-  totalPrice       Float
-
-  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
-
-  @@index([purchaseOrderId])
-  @@index([deviceCategoryId])
-}
-
-model Quotation {
-  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-
-  vendorId      String @db.Uuid
-  requirementId String @db.Uuid
-
-  items             Json
-  validTill         DateTime
-  deliveryDays      Int
-  paymentTerms      String
-  gst               Float
-  additionalCharges Float
-  subtotal          Float
-  gstAmount         Float
-  grandTotal        Float
-  remarks           String?
-
-  status QuotationStatus @default(PENDING)
-
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  vendor      Vendor      @relation(fields: [vendorId], references: [id])
-  requirement Requirement @relation(fields: [requirementId], references: [id])
-
-  @@index([vendorId])
-  @@index([requirementId])
-}
